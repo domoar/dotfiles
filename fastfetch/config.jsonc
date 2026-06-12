@@ -1,0 +1,63 @@
+{
+  "$schema": "https://raw.githubusercontent.com/fastfetch-cli/fastfetch/master/doc/json_schema.json",
+
+  "display": {
+    "separator": "  ",
+    "color": "default",
+    "hideCursor": true
+  },
+
+  "modules": [
+    {
+      "type": "title"
+    },
+    {
+      "type": "os",
+      "format": "{1} {2} ({3})"
+    },
+    {
+      "type": "kernel"
+    },
+    {
+      "type": "locale"
+    },
+    {
+      "type": "uptime"
+    },
+    {
+      "type": "packages",
+      "format": "{1} (winget)"
+    },
+    {
+      "type": "shell"
+    },
+    {
+      "type": "terminal"
+    },
+    {
+      "type": "cpu",
+      "format": "{1} ({3} cores, {4} threads)"
+    },
+    {
+      "type": "gpu"
+    },
+    {
+      "type": "memory",
+      "format": "{2} / {1} ({3}%)"
+    },
+    {
+      "type": "disk",
+      "format": "{1}: {2} / {3} ({4}%)"
+    },
+    {
+      "type": "battery"
+    },
+    {
+      "type": "datetime",
+      "format": "{1} {2}"
+    },
+    {
+      "type": "localip"
+    }
+  ]
+}
