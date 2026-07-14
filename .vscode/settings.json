@@ -2,5 +2,13 @@
   "editor.formatOnSave": true,
   "[json]": {
     "editor.defaultFormatter": "vscode.json-language-features"
-  }
+  },
+  "workbench.productIconTheme": "material-product-icons",
+  "workbench.iconTheme": "material-icon-theme",
+  "workbench.colorTheme": "GitHub Dark High Contrast",
+  "liveServer.settings.donotShowInfoMsg": true,
+  "git.openRepositoryInParentFolders": "never",
+  "git.suggestSmartCommit": false,
+  "terminal.integrated.defaultLocation": "editor",
+  "editor.minimap.enabled": false
 }

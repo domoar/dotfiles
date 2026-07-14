@@ -1,0 +1,198 @@
+{
+    "$help": "https://aka.ms/terminal-documentation",
+    "$schema": "https://aka.ms/terminal-profiles-schema",
+    "actions": [
+        {
+            "command": {
+                "action": "copy",
+                "singleLine": false
+            },
+            "id": "User.copy.644BA8F2"
+        },
+        {
+            "command": {
+                "action": "splitPane",
+                "split": "down"
+            },
+            "id": "User.splitPane.D5151347"
+        },
+        {
+            "command": "paste",
+            "id": "User.paste"
+        },
+        {
+            "command": {
+                "action": "splitPane",
+                "split": "left"
+            },
+            "id": "User.splitPane.21DBB4A1"
+        },
+        {
+            "command": "find",
+            "id": "User.find"
+        },
+        {
+            "command": {
+                "action": "splitPane",
+                "split": "auto",
+                "splitMode": "duplicate"
+            },
+            "id": "User.splitPane.A6751878"
+        },
+        {
+            "command": {
+                "action": "splitPane",
+                "split": "right"
+            },
+            "id": "User.splitPane.864CD510"
+        },
+        {
+            "command": {
+                "action": "splitPane",
+                "split": "auto"
+            },
+            "id": "User.splitPane.91AB55B1"
+        },
+        {
+            "command": {
+                "action": "splitPane",
+                "split": "up"
+            },
+            "id": "User.splitPane.B39B174B"
+        }
+    ],
+    "copyFormatting": "none",
+    "copyOnSelect": false,
+    "defaultProfile": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
+    "keybindings": [
+        {
+            "id": "User.copy.644BA8F2",
+            "keys": "ctrl+c"
+        },
+        {
+            "id": "User.paste",
+            "keys": "ctrl+v"
+        },
+        {
+            "id": "User.find",
+            "keys": "ctrl+shift+f"
+        },
+        {
+            "id": "User.splitPane.A6751878",
+            "keys": "alt+shift+d"
+        }
+    ],
+    "newTabMenu": [
+        {
+            "type": "remainingProfiles"
+        }
+    ],
+    "profiles": {
+        "defaults": {
+            "bellStyle": [
+                "window",
+                "taskbar"
+            ],
+            "colorScheme": "Ubuntu-ColorScheme",
+            "font": {
+                "face": "JetBrainsMono Nerd Font"
+            }
+        },
+        "list": [
+            {
+                "colorScheme": "One Half Dark",
+                "commandline": "C:\\Users\\Manuel\\Dausmann\\powershell\\latestshell\\pwsh.exe",
+                "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
+                "hidden": false,
+                "name": "Windows PowerShell"
+            },
+            {
+                "commandline": "%SystemRoot%\\System32\\cmd.exe",
+                "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
+                "hidden": false,
+                "name": "Eingabeaufforderung"
+            },
+            {
+                "guid": "{b453ae62-4e3d-5e58-b989-0a998ec441b8}",
+                "hidden": false,
+                "name": "Azure Cloud Shell",
+                "source": "Windows.Terminal.Azure"
+            },
+            {
+                "guid": "{51855cb2-8cce-5362-8f54-464b92b32386}",
+                "hidden": false,
+                "name": "Ubuntu",
+                "source": "CanonicalGroupLimited.Ubuntu_79rhkp1fndgsc"
+            },
+            {
+                "commandline": "wt -w 0 new-tab -p \"Postgres\" ; split-pane -V -p \"Frontend\"  ; move-focus left ; split-pane -H -p \"Backend\" ; move-focus up ; move-focus right ; split-pane -H -p \"KeyCloak\"",
+                "elevate": false,
+                "guid": "{3dbac668-528f-4465-9baa-972aa24c4783}",
+                "hidden": false,
+                "name": "Demo",
+                "tabTitle": "Demo"
+            },
+            {
+                "commandline": "C:\\Dausmann\\Powershell\\pwsh.exe -NoExit -Command \"docker compose up\"",
+                "guid": "{9f028c26-22a2-4b5d-861c-685c2d1a7351}",
+                "hidden": true,
+                "name": "Postgres",
+                "startingDirectory": "C:\\Users\\Manuel\\projects\\SWE\\beispiel\\.extras\\compose\\backend\\postgres",
+                "tabTitle": "Postgres"
+            },
+            {
+                "commandline": "C:\\Dausmann\\Powershell\\pwsh.exe -NoExit -Command \"docker compose up\"",
+                "guid": "{b9473ba0-6a27-4909-8ebd-17f65c33d715}",
+                "hidden": true,
+                "name": "KeyCloak",
+                "startingDirectory": "C:\\Users\\Manuel\\projects\\SWE\\beispiel\\.extras\\compose\\backend\\keycloak",
+                "tabTitle": "KeyCloak"
+            },
+            {
+                "commandline": "C:\\Dausmann\\Powershell\\pwsh.exe -NoExit -Command \"npm run dev\"",
+                "guid": "{309b8dcd-a146-4b08-ab35-7cbb4994d781}",
+                "hidden": true,
+                "name": "Frontend",
+                "startingDirectory": "C:\\Users\\Manuel\\projects\\SWE\\Project_Abgabe.2",
+                "tabTitle": "Frontend"
+            },
+            {
+                "commandline": "C:\\Dausmann\\Powershell\\pwsh.exe -NoExit -Command \"npm run dev\"",
+                "guid": "{91cd49ac-c7c7-4beb-95dc-16f0613eb8cb}",
+                "hidden": true,
+                "name": "Backend",
+                "startingDirectory": "C:\\Users\\Manuel\\projects\\SWE\\beispiel",
+                "tabTitle": "Backend"
+            },
+            {
+                "guid": "{16208362-94fc-5b1f-a491-5b2624d5ab56}",
+                "hidden": true,
+                "name": "Visual Studio Debug Console",
+                "source": "VSDebugConsole"
+            },
+            {
+                "altGrAliasing": true,
+                "antialiasingMode": "grayscale",
+                "closeOnExit": "automatic",
+                "colorScheme": "One Half Dark",
+                "commandline": "C:\\Users\\Manuel\\Dausmann\\powershell\\latestshell\\pwsh.exe -Command \"bruno\"",
+                "cursorShape": "bar",
+                "font": {
+                    "size": 12
+                },
+                "guid": "{ed73c608-e6e7-4b59-8f54-40a4549b0e37}",
+                "hidden": false,
+                "historySize": 9001,
+                "icon": "ms-appx:///ProfileIcons/{61c54bbd-c2c6-5271-96e7-009a87ff44bf}.png",
+                "name": "bruno",
+                "padding": "8, 8, 8, 8",
+                "snapOnInput": true,
+                "startingDirectory": "%USERPROFILE%",
+                "tabTitle": "bruno",
+                "useAcrylic": false
+            }
+        ]
+    },
+    "schemes": [],
+    "themes": []
+}
