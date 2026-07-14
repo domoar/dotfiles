@@ -72,11 +72,28 @@ function Set-UserEnvVariable {
     Write-Log -Message "Note: other already-open terminals won't see these changes until restarted." -LogLevel DBG
 }
 
+# Add Modules Path to PSModulePath
+
 function Invoke-SetEnvVariables {
     $envVars = @(
-        [PSCustomObject]@{ Name = "PWSH_HOME";    Value = Join-Path $userPath "pwsh/latest";   AddToPath = $true }
-        [PSCustomObject]@{ Name = "SOFTWARE_DIR"; Value = Join-Path $userPath "software";      AddToPath = $false }
-        [PSCustomObject]@{ Name = "TOOLS_DIR"; Value = Join-Path $userPath "tools";      AddToPath = $false }
+        [PSCustomObject]@{ Name = "TOOLS_DIR";         Value = Join-Path $userPath "tools";     AddToPath = $false },
+        [PSCustomObject]@{ Name = "PWSH_HOME";         Value = "%TOOLS_DIR%/pwsh/latest";       AddToPath = $true  },
+        [PSCustomObject]@{ Name = "GOROOT";            Value = "%TOOLS_DIR%/go";                AddToPath = $true  },
+        [PSCustomObject]@{ Name = "GOHOME";            Value = "%TOOLS_DIR%/go";                AddToPath = $true  },
+        [PSCustomObject]@{ Name = "GIT_HOME";          Value = "%TOOLS_DIR%/git";               AddToPath = $true  },
+        [PSCustomObject]@{ Name = "GIT_BIN";           Value = "%GIT_HOME%/bin";                AddToPath = $true  },
+        [PSCustomObject]@{ Name = "GIT_CMD";           Value = "%GIT_HOME%/cmd";                AddToPath = $true  },
+        [PSCustomObject]@{ Name = "GH_CLI_HOME";       Value = "%TOOLS_DIR%/github";            AddToPath = $true  },
+        [PSCustomObject]@{ Name = "JAVA_HOME";         Value = "%TOOLS_DIR%/java";              AddToPath = $true  },
+        [PSCustomObject]@{ Name = "JDK_HOME";          Value = "%JAVA_HOME%";                   AddToPath = $true  },
+        [PSCustomObject]@{ Name = "JRE_HOME";          Value = "%JAVA_HOME%/jre";               AddToPath = $true  },   
+        [PSCustomObject]@{ Name = "NPM_CONFIG_PREFIX"; Value = "%TOOLS_DIR%/npm";               AddToPath = $true  },
+        [PSCustomObject]@{ Name = "NODE_JS_HOME";      Value = "%TOOLS_DIR%/nodejs";            AddToPath = $true  },
+        [PSCustomObject]@{ Name = "AZURE_CLI_HOME";    Value = "%TOOLS_DIR%/azure";             AddToPath = $true  },
+        [PSCustomObject]@{ Name = "DOTNET_HOME";       Value = "%TOOLS_DIR%/dotnet";            AddToPath = $true  },
+        [PSCustomObject]@{ Name = "DOTNET_TOOLS";      Value = "%DOTNET_HOME%/tools";           AddToPath = $true  },
+        [PSCustomObject]@{ Name = "SQLITE3_HOME";      Value = "%TOOLS_DIR%/sqlite3";           AddToPath = $true  },
+        [PSCustomObject]@{ Name = "TEXLIVE_HOME";      Value = "%TOOLS_DIR%/texlive";           AddToPath = $true  },
     )
 
     foreach ($entry in $envVars) {
@@ -92,26 +109,13 @@ function Invoke-SetEnvVariables {
 }
 
 $userPath = $env:USERPROFILE
-
+$toolsPath = Join-Path $userPath ".cfg/tools"
 
 Write-Log -Message "(1/x) Starting script execution ..." -LogLevel INF
-
 
 $rootPath = Join-Path $env:USERPROFILE ".cfg"
 New-Item -ItemType Directory -Force -Path $rootPath
 Write-Log -Message "Created root path at $rootPath" -LogLevel INF
-
-$pwshPath = Join-Path $rootPath "pwsh/latest"
-New-Item -ItemType Directory -Force -Path $pwshPath
-Write-Log -Message "Created pwsh path at $pwshPath" -LogLevel INF
-
-$pwshModulesPath = Join-Path $rootPath "pwsh/cus-modules"
-New-Item -ItemType Directory -Force -Path $pwshModulesPath
-Write-Log -Message "Created modules path at $pwshModulesPath" -LogLevel INF
-
-$softwarePath = Join-Path $rootPath "software"
-New-Item -ItemType Directory -Force -Path $softwarePath
-Write-Log -Message "Created software path at $softwarePath" -LogLevel INF
 
 $miscPath = Join-Path $rootPath "misc/backgrounds"
 New-Item -ItemType Directory -Force -Path $miscPath
@@ -121,10 +125,15 @@ $toolspath = Join-Path $rootPath "tools"
 New-Item -ItemType Directory -Force -Path $toolspath
 Write-Log -Message "Created tools path at $toolspath" -LogLevel INF
 
+$pwshPath = Join-Path $toolsPath "pwsh/latest"
+New-Item -ItemType Directory -Force -Path $pwshPath
+Write-Log -Message "Created pwsh path at $pwshPath" -LogLevel INF
 
-# Set-UserEnvVariable -Name "MY_VAR" -Value "some_value"
+$pwshModulesPath = Join-Path $rootPath "pwsh/cus-modules"
+New-Item -ItemType Directory -Force -Path $pwshModulesPath
+Write-Log -Message "Created modules path at $pwshModulesPath" -LogLevel INF
 
-# Set-UserEnvVariable -Name "MY_VAR_IN_PATH" -Value "D:\temp\beispiele-test3" -AddToPath
+
 
 Write-Log -Message "(2/x) Starting installer..." -LogLevel INF
 winget install -e --id OpenJS.NodeJS.LTS
