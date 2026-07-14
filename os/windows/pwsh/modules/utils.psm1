@@ -388,10 +388,10 @@ Export-ModuleMember -Function Stop-RunningWSL -Alias exvirt
 Starts a new elevated Windows Terminal PowerShell session.
 
 .USAGE
-Elevate-Terminal
+Start-ElevatedTerminal
 elevate
 #>
-function Elevate-Terminal {
+function Start-ElevatedTerminal {
     Start-Process wt.exe -Verb RunAs -ArgumentList "-p `"PowerShell`""
 }
-Export-ModuleMember -Function Elevate-Terminal -Alias elevate
+Export-ModuleMember -Function Start-ElevatedTerminal -Alias elevate

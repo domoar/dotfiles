@@ -1,3 +1,4 @@
+#region helpers
 <#
 .SYNOPSIS
 Writes a timestamped, color-coded log message to the console.
@@ -29,23 +30,22 @@ function Write-Log {
 
     $logEntry = '[{0}] [{1}] [{2}] [PID:{3}] {4}' -f `
         $timestamp,
-        $LogLevel.ToUpperInvariant(),
-        $computerName,
-        $processId,
-        $Message
+    $LogLevel.ToUpperInvariant(),
+    $computerName,
+    $processId,
+    $Message
 
     $foregroundColor = switch ($LogLevel) {
-        'TRC'    { 'DarkGray' }
-        'DBG'    { 'Gray' }
-        'INF'    { 'Green' }
-        'WRN'    { 'Yellow' }
-        'ERR'    { 'Red' }
-        'CRI'    { 'Magenta' }
+        'TRC' { 'DarkGray' }
+        'DBG' { 'Gray' }
+        'INF' { 'Green' }
+        'WRN' { 'Yellow' }
+        'ERR' { 'Red' }
+        'CRI' { 'Magenta' }
     }
 
     Write-Host $logEntry -ForegroundColor $foregroundColor
 }
-
 <#
 .SYNOPSIS
 Sets a user-scoped environment variable and optionally appends its value to the user PATH.
@@ -91,7 +91,8 @@ function Set-UserEnvVariable {
         else {
             $newUserPath = if ([string]::IsNullOrEmpty($currentUserPath)) {
                 $Value
-            } else {
+            }
+            else {
                 "$currentUserPath;$Value"
             }
 
@@ -112,28 +113,28 @@ Invoke-SetEnvVariables
 #>
 function Invoke-SetEnvVariables {
     $envVars = @(
-        [PSCustomObject]@{ Name = "TOOLS_DIR";         Value = Join-Path $userPath "tools";     AddToPath = $false },
-        [PSCustomObject]@{ Name = "BRUNO_HOME";        Value = "%TOOLS_DIR%/bruno";             AddToPath = $false },
-        [PSCustomObject]@{ Name = "PWSH_HOME";         Value = "%TOOLS_DIR%/pwsh/latest";       AddToPath = $true  },
-        [PSCustomObject]@{ Name = "PSModulePath";      Value = "%TOOLS_DIR%/pwsh/modules";      AddToPath = $false },
-        [PSCustomObject]@{ Name = "GOROOT";            Value = "%TOOLS_DIR%/go";                AddToPath = $true  },
-        [PSCustomObject]@{ Name = "GOHOME";            Value = "%TOOLS_DIR%/go";                AddToPath = $true  },
-        [PSCustomObject]@{ Name = "GIT_HOME";          Value = "%TOOLS_DIR%/git";               AddToPath = $true  },
-        [PSCustomObject]@{ Name = "GIT_BIN";           Value = "%GIT_HOME%/bin";                AddToPath = $true  },
-        [PSCustomObject]@{ Name = "GIT_CMD";           Value = "%GIT_HOME%/cmd";                AddToPath = $true  },
-        [PSCustomObject]@{ Name = "GH_CLI_HOME";       Value = "%TOOLS_DIR%/github";            AddToPath = $true  },
-        [PSCustomObject]@{ Name = "JAVA_HOME";         Value = "%TOOLS_DIR%/java";              AddToPath = $true  },
-        [PSCustomObject]@{ Name = "JDK_HOME";          Value = "%JAVA_HOME%";                   AddToPath = $true  },
-        [PSCustomObject]@{ Name = "JRE_HOME";          Value = "%JAVA_HOME%/jre";               AddToPath = $true  },   
-        [PSCustomObject]@{ Name = "NPM_CONFIG_PREFIX"; Value = "%TOOLS_DIR%/npm";               AddToPath = $true  },
-        [PSCustomObject]@{ Name = "NODE_JS_HOME";      Value = "%TOOLS_DIR%/nodejs";            AddToPath = $true  },
-        [PSCustomObject]@{ Name = "AZURE_CLI_HOME";    Value = "%TOOLS_DIR%/azure";             AddToPath = $true  },
-        [PSCustomObject]@{ Name = "DOTNET_HOME";       Value = "%TOOLS_DIR%/dotnet";            AddToPath = $true  },
-        [PSCustomObject]@{ Name = "DOTNET_TOOLS";      Value = "%DOTNET_HOME%/tools";           AddToPath = $true  },
-        [PSCustomObject]@{ Name = "SQLITE3_HOME";      Value = "%TOOLS_DIR%/sqlite3";           AddToPath = $true  },
-        [PSCustomObject]@{ Name = "TEXLIVE_HOME";      Value = "%TOOLS_DIR%/texlive";           AddToPath = $true  },
-        [PSCustomObject]@{ Name = "PYTHON_HOME";       Value = "%TOOLS_DIR%/python";            AddToPath = $true  },
-        [PSCustomObject]@{ Name = "FONTS_DIR";         Value = Join-Path $rootPath "fonts";     AddToPath = $false  },
+        [PSCustomObject]@{ Name = "TOOLS_DIR"; Value = Join-Path $userPath "tools"; AddToPath = $false },
+        [PSCustomObject]@{ Name = "BRUNO_HOME"; Value = "%TOOLS_DIR%/bruno"; AddToPath = $false },
+        [PSCustomObject]@{ Name = "PWSH_HOME"; Value = "%TOOLS_DIR%/pwsh/latest"; AddToPath = $true },
+        [PSCustomObject]@{ Name = "PSModulePath"; Value = "%TOOLS_DIR%/pwsh/modules"; AddToPath = $false },
+        [PSCustomObject]@{ Name = "GOROOT"; Value = "%TOOLS_DIR%/go"; AddToPath = $true },
+        [PSCustomObject]@{ Name = "GOHOME"; Value = "%TOOLS_DIR%/go"; AddToPath = $true },
+        [PSCustomObject]@{ Name = "GIT_HOME"; Value = "%TOOLS_DIR%/git"; AddToPath = $true },
+        [PSCustomObject]@{ Name = "GIT_BIN"; Value = "%GIT_HOME%/bin"; AddToPath = $true },
+        [PSCustomObject]@{ Name = "GIT_CMD"; Value = "%GIT_HOME%/cmd"; AddToPath = $true },
+        [PSCustomObject]@{ Name = "GH_CLI_HOME"; Value = "%TOOLS_DIR%/github"; AddToPath = $true },
+        [PSCustomObject]@{ Name = "JAVA_HOME"; Value = "%TOOLS_DIR%/java"; AddToPath = $true },
+        [PSCustomObject]@{ Name = "JDK_HOME"; Value = "%JAVA_HOME%"; AddToPath = $true },
+        [PSCustomObject]@{ Name = "JRE_HOME"; Value = "%JAVA_HOME%/jre"; AddToPath = $true },   
+        [PSCustomObject]@{ Name = "NPM_CONFIG_PREFIX"; Value = "%TOOLS_DIR%/npm"; AddToPath = $true },
+        [PSCustomObject]@{ Name = "NODE_JS_HOME"; Value = "%TOOLS_DIR%/nodejs"; AddToPath = $true },
+        [PSCustomObject]@{ Name = "AZURE_CLI_HOME"; Value = "%TOOLS_DIR%/azure"; AddToPath = $true },
+        [PSCustomObject]@{ Name = "DOTNET_HOME"; Value = "%TOOLS_DIR%/dotnet"; AddToPath = $true },
+        [PSCustomObject]@{ Name = "DOTNET_TOOLS"; Value = "%DOTNET_HOME%/tools"; AddToPath = $true },
+        [PSCustomObject]@{ Name = "SQLITE3_HOME"; Value = "%TOOLS_DIR%/sqlite3"; AddToPath = $true },
+        [PSCustomObject]@{ Name = "TEXLIVE_HOME"; Value = "%TOOLS_DIR%/texlive"; AddToPath = $true },
+        [PSCustomObject]@{ Name = "PYTHON_HOME"; Value = "%TOOLS_DIR%/python"; AddToPath = $true },
+        [PSCustomObject]@{ Name = "FONTS_DIR"; Value = Join-Path $rootPath "fonts"; AddToPath = $false },
     )
 
     foreach ($entry in $envVars) {
@@ -236,71 +237,146 @@ function Install-NerdFont {
         }
     }
 }
+<#
+.SYNOPSIS
+Creates a configuration directory under the current user's profile directory.
+
+.DESCRIPTION
+Creates a directory with the specified folder name inside the user's profile path.
+If the directory already exists, it will be preserved due to the use of the Force parameter.
+
+.PARAMETER FolderName
+The name of the directory to create under the user's profile directory.
+
+.EXAMPLE
+New-CfgDirectory -FolderName ".cfg"
+
+Creates the directory C:\Users\<User>\.cfg.
+#>
+function New-CfgDirectory {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$FolderName
+    )
+
+    $rootPath = Join-Path $env:USERPROFILE $FolderName
+
+    New-Item -ItemType Directory -Force -Path $rootPath | Out-Null
+
+    Write-Log -Message "Created root path at $rootPath" -LogLevel INF
+
+    return $rootPath
+}
+
+function Install-LatestPowerShellZip {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [string]$DestinationPath
+    )
+
+    $release = Invoke-RestMethod `
+        -Uri "https://api.github.com/repos/PowerShell/PowerShell/releases/latest"
+
+    $asset = $release.assets |
+    Where-Object { $_.name -like "*win-x64.zip" } |
+    Select-Object -First 1
+
+    if (-not $asset) {
+        Write-Log -Message "Unable to locate the latest PowerShell win-x64 ZIP asset." -LogLevel ERR
+        exit 1
+    }
+
+    $zipPath = Join-Path $env:TEMP $asset.name
+
+    Invoke-WebRequest `
+        -Uri $asset.browser_download_url `
+        -OutFile $zipPath
+
+    New-Item -ItemType Directory -Force -Path $DestinationPath | Out-Null
+
+    Expand-Archive `
+        -Path $zipPath `
+        -DestinationPath $DestinationPath `
+        -Force
+
+    Remove-Item $zipPath -Force
+
+    Write-Log -Message "Installed PowerShell $($release.tag_name) to '$DestinationPath'" -LogLevel INF
+}
+#endregion helpers
+
+$rootPath = Join-Path $env:USERPROFILE ".cfg"
+$userPath = $env:USERPROFILE
+
+
+#region directories
+Write-Log -Message "(1/4) Starting directory setup ..." -LogLevel INF
+
+$cfgPath = New-CfgDirectory -FolderName $rootPath
+New-CfgDirectory -FolderName (Join-Path $cfgPath "tools")
+New-CfgDirectory -FolderName (Join-Path $cfgPath "misc/backgrounds")
+New-CfgDirectory -FolderName (Join-Path $cfgPath "pwsh/modules")
+New-CfgDirectory -FolderName (Join-Path $cfgPath "pwsh/latest")
+
+#endregion directories
+
+
+
+#region tools
+Write-Log -Message "(2/4) Starting tool setup ..." -LogLevel INF
+if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
+    Write-Log -Message "'winget' CLI is not available." -LogLevel CRI
+    exit 1
+}
+
+Install-LatestPowerShellZip -DestinationPath (Join-Path $cfgPath "pwsh/latest")
+
+winget install -e --id OpenJS.NodeJS.LTS
+winget install -e --id Microsoft.WindowsTerminal.Preview
+winget install fastfetch
+winget install Starship.Starship
+#endregion tools
+
+
+
+#region post-install
+Write-Log -Message "(3/4) Starting post-installation tasks ..." -LogLevel INF
+
+Write-Log -Message "Installing fonts ..." -LogLevel INF
+Install-NerdFont `
+    -Url 'https://github.com/ryanoasis/nerd-fonts/releases/latest/download/IBMPlexMono.zip' `
+    -FontName 'IBMPlexMono'
+
+Install-NerdFont `
+    -Url 'https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip' `
+    -FontName 'JetBrainsMono'
+
+Write-Log -Message "Setting env variables ..." -LogLevel INF
+Invoke-SetEnvVariables
 
 [Environment]::SetEnvironmentVariable("OPENROUTER_API_KEY", "", "User")
 [Environment]::SetEnvironmentVariable("COGNIGY_API_KEY", "", "User")
 [Environment]::SetEnvironmentVariable("ANTHROPIC_API_KEY", "", "User")
 [Environment]::SetEnvironmentVariable("OPENAI_API_KEY", "", "User")
 
-$userPath = $env:USERPROFILE
-$toolsPath = Join-Path $userPath ".cfg/tools"
-
-#region exec script
-Write-Log -Message "(1/x) Starting script execution ..." -LogLevel INF
-
-$rootPath = Join-Path $env:USERPROFILE ".cfg"
-New-Item -ItemType Directory -Force -Path $rootPath
-Write-Log -Message "Created root path at $rootPath" -LogLevel INF
-
-$miscPath = Join-Path $rootPath "misc/backgrounds"
-New-Item -ItemType Directory -Force -Path $miscPath
-Write-Log -Message "Created misc path at $miscPath" -LogLevel INF
-
-$toolspath = Join-Path $rootPath "tools"
-New-Item -ItemType Directory -Force -Path $toolspath
-Write-Log -Message "Created tools path at $toolspath" -LogLevel INF
-
-$pwshPath = Join-Path $toolsPath "pwsh/latest"
-New-Item -ItemType Directory -Force -Path $pwshPath
-Write-Log -Message "Created pwsh path at $pwshPath" -LogLevel INF
-
-$pwshModulesPath = Join-Path $rootPath "pwsh/modules"
-New-Item -ItemType Directory -Force -Path $pwshModulesPath
-Write-Log -Message "Created modules path at $pwshModulesPath" -LogLevel INF
-#endregion exec script
-
-#region install tools
-Write-Log -Message "(2/x) Starting installer..." -LogLevel INF
-winget install -e --id OpenJS.NodeJS.LTS
-winget install -e --id Microsoft.WindowsTerminal.Preview
-winget install fastfetch
-winget install Starship.Starship
-#endregion install tools
-
-#region post-install
-Write-Log -Message "(3/x) Starting post-installation tasks ..." -LogLevel INF
-Invoke-SetEnvVariables
+Write-Log -Message "Creating symlinks ..." -LogLevel INF
+New-Item -ItemType SymbolicLink `
+    -Path "$HOME\.config\starship.toml" `
+    -Target "$HOME\projects\dotfiles\starship\starship.toml"
 
 New-Item -ItemType SymbolicLink `
-  -Path "$HOME\.config\starship.toml" `
-  -Target "$HOME\projects\dotfiles\starship\starship.toml"
-
-New-Item -ItemType SymbolicLink `
-  -Path "$LOCALAPPDATA\fastfetch\config.jsonc" `
-  -Target "$HOME\projects\dotfiles\fastfetch\config.jsonc"
-
-
-$zip = Join-Path $env:TEMP "IBMPlexMono.zip"
-$extract = Join-Path $env:TEMP "IBMPlexMono"
-Write-Log -Message "Post-installation tasks complete." -LogLevel INF
+    -Path "$LOCALAPPDATA\fastfetch\config.jsonc" `
+    -Target "$HOME\projects\dotfiles\fastfetch\config.jsonc"
 #endregion post-install
 
-#region font installer
-Write-Log -Message "(4/x) Starting font installer ..." -LogLevel INF
 
-Install-NerdFont `
-    -Url 'https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/IBMPlexMono.zip' `
-    -FontName 'IBMPlexMono'
 
-Write-Log -Message "Font installation complete." -LogLevel INF
-#endregion font installer
+#region cfgs
+Write-Log -Message "(4/4) Starting configuration ..." -LogLevel INF
+if (-not (Get-Command code -ErrorAction SilentlyContinue)) {
+    Write-Log -Message "'code' CLI is not available." -LogLevel CRI
+    exit 1
+}
+
+#endregion cfgs
