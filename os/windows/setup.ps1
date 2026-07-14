@@ -1,3 +1,17 @@
+<#
+.SYNOPSIS
+Writes a timestamped, color-coded log message to the console.
+
+.PARAMETER Message
+The message text to write to the console.
+
+.PARAMETER LogLevel
+The severity level for the log entry. Valid values are TRC, DBG, INF, WRN, ERR, and CRI. Defaults to INF.
+
+.USAGE
+Write-Log -Message "Starting setup" -LogLevel INF
+Write-Log -Message "Something failed" -LogLevel ERR
+#>
 function Write-Log {
     [CmdletBinding()]
     param (
@@ -32,6 +46,23 @@ function Write-Log {
     Write-Host $logEntry -ForegroundColor $foregroundColor
 }
 
+<#
+.SYNOPSIS
+Sets a user-scoped environment variable and optionally appends its value to the user PATH.
+
+.PARAMETER Name
+The name of the environment variable to set.
+
+.PARAMETER Value
+The value to assign to the environment variable.
+
+.PARAMETER AddToPath
+Adds the value to the user PATH when specified.
+
+.USAGE
+Set-UserEnvVariable -Name "TOOLS_DIR" -Value "$env:USERPROFILE\.cfg\tools"
+Set-UserEnvVariable -Name "PWSH_HOME" -Value "%TOOLS_DIR%/pwsh/latest" -AddToPath
+#>
 function Set-UserEnvVariable {
     [CmdletBinding()]
     param(
@@ -72,12 +103,19 @@ function Set-UserEnvVariable {
     Write-Log -Message "Note: other already-open terminals won't see these changes until restarted." -LogLevel DBG
 }
 
-# Add Modules Path to PSModulePath
+<#
+.SYNOPSIS
+Configures the standard user environment variables used by the Windows tool setup.
 
+.USAGE
+Invoke-SetEnvVariables
+#>
 function Invoke-SetEnvVariables {
     $envVars = @(
         [PSCustomObject]@{ Name = "TOOLS_DIR";         Value = Join-Path $userPath "tools";     AddToPath = $false },
+        [PSCustomObject]@{ Name = "BRUNO_HOME";        Value = "%TOOLS_DIR%/bruno";             AddToPath = $false },
         [PSCustomObject]@{ Name = "PWSH_HOME";         Value = "%TOOLS_DIR%/pwsh/latest";       AddToPath = $true  },
+        [PSCustomObject]@{ Name = "PSModulePath";      Value = "%TOOLS_DIR%/pwsh/modules";      AddToPath = $false },
         [PSCustomObject]@{ Name = "GOROOT";            Value = "%TOOLS_DIR%/go";                AddToPath = $true  },
         [PSCustomObject]@{ Name = "GOHOME";            Value = "%TOOLS_DIR%/go";                AddToPath = $true  },
         [PSCustomObject]@{ Name = "GIT_HOME";          Value = "%TOOLS_DIR%/git";               AddToPath = $true  },
@@ -94,6 +132,8 @@ function Invoke-SetEnvVariables {
         [PSCustomObject]@{ Name = "DOTNET_TOOLS";      Value = "%DOTNET_HOME%/tools";           AddToPath = $true  },
         [PSCustomObject]@{ Name = "SQLITE3_HOME";      Value = "%TOOLS_DIR%/sqlite3";           AddToPath = $true  },
         [PSCustomObject]@{ Name = "TEXLIVE_HOME";      Value = "%TOOLS_DIR%/texlive";           AddToPath = $true  },
+        [PSCustomObject]@{ Name = "PYTHON_HOME";       Value = "%TOOLS_DIR%/python";            AddToPath = $true  },
+        [PSCustomObject]@{ Name = "FONTS_DIR";         Value = Join-Path $rootPath "fonts";     AddToPath = $false  },
     )
 
     foreach ($entry in $envVars) {
@@ -108,9 +148,104 @@ function Invoke-SetEnvVariables {
     }
 }
 
+<#
+.SYNOPSIS
+Downloads and installs a Nerd Font package on Windows.
+
+.DESCRIPTION
+Downloads a ZIP archive from the specified URL, extracts all TrueType font
+files, copies them to the Windows Fonts directory, and registers them under
+the system-wide Windows Fonts registry key.
+
+The function requires administrative privileges because it writes to the
+Windows Fonts directory and the HKEY_LOCAL_MACHINE registry hive.
+
+Temporary download and extraction files are removed after installation.
+
+.PARAMETER Url
+Specifies the URL of the Nerd Font ZIP archive to download.
+
+.PARAMETER FontName
+Specifies the font package name. This value is used to create temporary file
+and extraction directory names.
+
+.EXAMPLE
+Install-NerdFont `
+    -Url 'https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/IBMPlexMono.zip' `
+    -FontName 'IBMPlexMono'
+
+Downloads and installs the IBM Plex Mono Nerd Font package.
+
+.NOTES
+Requires Windows and an elevated PowerShell session.
+#>
+function Install-NerdFont {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [string]$Url,
+
+        [Parameter(Mandatory)]
+        [string]$FontName
+    )
+
+    $zip = Join-Path $env:TEMP "$FontName.zip"
+    $extract = Join-Path $env:TEMP "$FontName"
+
+    try {
+        Invoke-WebRequest `
+            -Uri $Url `
+            -OutFile $zip
+
+        Expand-Archive `
+            -Path $zip `
+            -DestinationPath $extract `
+            -Force
+
+        $fontsFolder = Join-Path $env:WINDIR 'Fonts'
+        $regPath = 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts'
+
+        Get-ChildItem $extract -Filter '*.ttf' | ForEach-Object {
+            $fontFile = $_.Name
+            $source = $_.FullName
+            $destination = Join-Path $fontsFolder $fontFile
+
+            Copy-Item $source $destination -Force
+
+            $fontCollection = [System.Drawing.Text.PrivateFontCollection]::new()
+            $fontCollection.AddFontFile($destination)
+            $family = $fontCollection.Families[0].Name
+
+            New-ItemProperty `
+                -Path $regPath `
+                -Name "$family (TrueType)" `
+                -Value $fontFile `
+                -PropertyType String `
+                -Force | Out-Null
+
+            Write-Log -Message "Installed: $family" -LogLevel INF
+        }
+    }
+    finally {
+        if (Test-Path $zip) {
+            Remove-Item $zip -Force
+        }
+
+        if (Test-Path $extract) {
+            Remove-Item $extract -Recurse -Force
+        }
+    }
+}
+
+[Environment]::SetEnvironmentVariable("OPENROUTER_API_KEY", "", "User")
+[Environment]::SetEnvironmentVariable("COGNIGY_API_KEY", "", "User")
+[Environment]::SetEnvironmentVariable("ANTHROPIC_API_KEY", "", "User")
+[Environment]::SetEnvironmentVariable("OPENAI_API_KEY", "", "User")
+
 $userPath = $env:USERPROFILE
 $toolsPath = Join-Path $userPath ".cfg/tools"
 
+#region exec script
 Write-Log -Message "(1/x) Starting script execution ..." -LogLevel INF
 
 $rootPath = Join-Path $env:USERPROFILE ".cfg"
@@ -129,16 +264,43 @@ $pwshPath = Join-Path $toolsPath "pwsh/latest"
 New-Item -ItemType Directory -Force -Path $pwshPath
 Write-Log -Message "Created pwsh path at $pwshPath" -LogLevel INF
 
-$pwshModulesPath = Join-Path $rootPath "pwsh/cus-modules"
+$pwshModulesPath = Join-Path $rootPath "pwsh/modules"
 New-Item -ItemType Directory -Force -Path $pwshModulesPath
 Write-Log -Message "Created modules path at $pwshModulesPath" -LogLevel INF
+#endregion exec script
 
-
-
+#region install tools
 Write-Log -Message "(2/x) Starting installer..." -LogLevel INF
 winget install -e --id OpenJS.NodeJS.LTS
 winget install -e --id Microsoft.WindowsTerminal.Preview
+winget install fastfetch
+winget install Starship.Starship
+#endregion install tools
 
-
+#region post-install
 Write-Log -Message "(3/x) Starting post-installation tasks ..." -LogLevel INF
 Invoke-SetEnvVariables
+
+New-Item -ItemType SymbolicLink `
+  -Path "$HOME\.config\starship.toml" `
+  -Target "$HOME\projects\dotfiles\starship\starship.toml"
+
+New-Item -ItemType SymbolicLink `
+  -Path "$LOCALAPPDATA\fastfetch\config.jsonc" `
+  -Target "$HOME\projects\dotfiles\fastfetch\config.jsonc"
+
+
+$zip = Join-Path $env:TEMP "IBMPlexMono.zip"
+$extract = Join-Path $env:TEMP "IBMPlexMono"
+Write-Log -Message "Post-installation tasks complete." -LogLevel INF
+#endregion post-install
+
+#region font installer
+Write-Log -Message "(4/x) Starting font installer ..." -LogLevel INF
+
+Install-NerdFont `
+    -Url 'https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/IBMPlexMono.zip' `
+    -FontName 'IBMPlexMono'
+
+Write-Log -Message "Font installation complete." -LogLevel INF
+#endregion font installer

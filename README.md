@@ -10,13 +10,8 @@ code --list-extensions | ForEach-Object { "code --install-extension $_" }
 code --profile "profile-name" --list-extensions
 ```
 
-Make env
+TODO Make env
 
-# In your $PROFILE, BEFORE any Import-Module lines
-
-$env:PSModulePath = "F:\path\to\dotfiles\PowerShell\Modules;" + $env:PSModulePath
-
-Import-Module MyTools
 
 Modules technically require manifests """New-ModuleManifest -Path "$HOME\Documents\PowerShell\Modules\MyTools\MyTools.psd1" `
 -RootModule "MyTools.psm1" `
@@ -24,4 +19,5 @@ Modules technically require manifests """New-ModuleManifest -Path "$HOME\Documen
 -AliasesToExport "fe" `
     -ModuleVersion "1.0.0""""
 
-New Command """Start-Process wt.exe -Verb RunAs -ArgumentList "-p `"PowerShell`""""" Set alias elevate
+
+TODO starhip porject recognizer
