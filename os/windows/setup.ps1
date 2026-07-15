@@ -337,6 +337,10 @@ winget install -e --id Microsoft.WindowsTerminal.Preview
 winget install -e --id Microsoft.PowerToys
 winget install fastfetch
 winget install Starship.Starship
+winget install --id GitHub.cli
+winget install -e --id Git.Git
+winget install -e --id Microsoft.VisualStudioCode
+
 #endregion tools
 
 
