@@ -334,6 +334,7 @@ Install-LatestPowerShellZip -DestinationPath (Join-Path $cfgPath "pwsh/latest")
 
 winget install -e --id OpenJS.NodeJS.LTS
 winget install -e --id Microsoft.WindowsTerminal.Preview
+winget install -e --id Microsoft.PowerToys
 winget install fastfetch
 winget install Starship.Starship
 #endregion tools
@@ -360,6 +361,11 @@ Invoke-SetEnvVariables
 [Environment]::SetEnvironmentVariable("ANTHROPIC_API_KEY", "", "User")
 [Environment]::SetEnvironmentVariable("OPENAI_API_KEY", "", "User")
 
+
+
+#region cfgs
+Write-Log -Message "(4/4) Starting configuration ..." -LogLevel INF
+
 Write-Log -Message "Creating symlinks ..." -LogLevel INF
 New-Item -ItemType SymbolicLink `
     -Path "$HOME\.config\starship.toml" `
@@ -369,14 +375,5 @@ New-Item -ItemType SymbolicLink `
     -Path "$LOCALAPPDATA\fastfetch\config.jsonc" `
     -Target "$HOME\projects\dotfiles\fastfetch\config.jsonc"
 #endregion post-install
-
-
-
-#region cfgs
-Write-Log -Message "(4/4) Starting configuration ..." -LogLevel INF
-if (-not (Get-Command code -ErrorAction SilentlyContinue)) {
-    Write-Log -Message "'code' CLI is not available." -LogLevel CRI
-    exit 1
-}
 
 #endregion cfgs

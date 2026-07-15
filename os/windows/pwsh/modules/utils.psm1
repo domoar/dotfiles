@@ -55,13 +55,14 @@ Get-Item .\README.md | ForEach-Object { scop $_.FullName }
 #>
 function scop {
     param (
-        [Parameter(Mandatory=$true, ValueFromPipeline=$true, Position=0)]
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true, Position = 0)]
         [string]$Path
     )
     if (Test-Path $Path) {
         Set-Clipboard -Path $Path
         Write-Log -Message "File '$Path' copied to clipboard" -LogLevel INF
-    } else {
+    }
+    else {
         Write-Log -Message "File '$Path' does not exist" -LogLevel ERR
     }
 }
@@ -294,7 +295,7 @@ function Show-Tree {
         }
 
         $folderColor = "`e[34m"  # Blue
-        $resetColor  = "`e[0m"
+        $resetColor = "`e[0m"
 
         $name = Split-Path $Path -Leaf
         $prefix = ""
@@ -304,7 +305,8 @@ function Show-Tree {
 
         if ($Depth -eq 0) {
             Write-Output "$folderColor$name/$resetColor"
-        } else {
+        }
+        else {
             $isLast = $ParentLastFlags[-1]
             $branch = $isLast ? "└── " : "├── "
             Write-Output "$prefix$branch$folderColor$name/$resetColor"
@@ -333,11 +335,13 @@ function Show-Tree {
 
             if ($child.PSIsContainer) {
                 Show-TreeInternal -Path $child.FullName -ParentLastFlags $newFlags -Depth ($Depth + 1) -MaxDepth $MaxDepth
-            } elseif ($f) {
+            }
+            elseif ($f) {
                 if ($s) {
                     $size = "{0,9:N0} B" -f $child.Length
                     Write-Output "$filePrefix$fileBranch$($child.Name) $size"
-                } else {
+                }
+                else {
                     Write-Output "$filePrefix$fileBranch$($child.Name)"
                 }
             }
@@ -375,7 +379,8 @@ function Stop-RunningWSL {
     if ($confirm -match '^[Yy]$') {
         Write-Log -Message "Shutting down WSL ..." -LogLevel INF
         wsl --shutdown
-    } else {
+    }
+    else {
         Write-Log -Message "Aborted." -LogLevel WRN
     }
 }
@@ -395,3 +400,28 @@ function Start-ElevatedTerminal {
     Start-Process wt.exe -Verb RunAs -ArgumentList "-p `"PowerShell`""
 }
 Export-ModuleMember -Function Start-ElevatedTerminal -Alias elevate
+
+<#
+.SYNOPSIS
+Copies an environment variable to the clipboard if it exists.
+
+.USAGE
+Copy-EnvironmentVariablesToClipboard -Name "ENV_VAR_NAME"
+cenv "ENV_VAR_NAME" can be upper-,lower-case or mixed case
+#>
+function Copy-EnvironmentVariablesToClipboard {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
+    $value = [System.Environment]::GetEnvironmentVariable($Name)
+    if ($value) {
+        Set-Clipboard -Value $value
+        Write-Log -Message "Environment variable '$Name' copied to clipboard." -LogLevel INF
+    }
+    else {
+        Write-Log -Message "Environment variable '$Name' does not exist." -LogLevel WRN
+    }
+}
+Export-ModuleMember -Function Copy-EnvironmentVariablesToClipboard -Alias cenv
