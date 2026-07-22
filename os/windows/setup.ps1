@@ -135,6 +135,7 @@ function Invoke-SetEnvVariables {
         [PSCustomObject]@{ Name = "TEXLIVE_HOME"; Value = "%TOOLS_DIR%/texlive"; AddToPath = $true },
         [PSCustomObject]@{ Name = "PYTHON_HOME"; Value = "%TOOLS_DIR%/python"; AddToPath = $true },
         [PSCustomObject]@{ Name = "FONTS_DIR"; Value = Join-Path $rootPath "fonts"; AddToPath = $false },
+        [PSCustomObject]@{ Name = "7Z_HOME"; Value = Join-Path "%TOOLS_DIR%/7zip"; AddToPath = $false }
     )
 
     foreach ($entry in $envVars) {
@@ -304,24 +305,78 @@ function Install-LatestPowerShellZip {
 
     Write-Log -Message "Installed PowerShell $($release.tag_name) to '$DestinationPath'" -LogLevel INF
 }
+<#
+.SYNOPSIS
+Imports environment variables from a .env file into the current PowerShell process.
+
+.DESCRIPTION
+Reads a .env file containing KEY=VALUE pairs, ignores blank lines and comments,
+removes surrounding single or double quotes from values, and sets each variable
+as a process-level environment variable.
+
+.PARAMETER Path
+The path to the .env file. Defaults to ".env".
+
+.EXAMPLE
+Import-DotEnv
+
+Imports environment variables from the .env file in the current directory.
+
+.EXAMPLE
+Import-DotEnv -Path "C:\Projects\MyApp\.env"
+
+Imports environment variables from the specified .env file.
+
+.NOTES
+Environment variables are set for the current PowerShell process only and are
+available to child processes started from the current session.
+#>
+function Import-DotEnv {
+    param(
+        [string]$Path = ".env"
+    )
+
+    Get-Content $Path | ForEach-Object {
+        if ($_ -match '^\s*#' -or $_ -match '^\s*$') { return }
+
+        $key, $value = $_ -split '=', 2
+        $key = $key.Trim()
+        $value = $value.Trim().Trim('"').Trim("'")
+
+        [Environment]::SetEnvironmentVariable($key, $value, "Process")
+    }
+}
 #endregion helpers
+
+Write-Log -Message "Starting Windows setup ..." -LogLevel INF
+if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+    Write-Log -Message "This script must be run as Administrator. Restarting with elevated privileges..." -LogLevel WRN
+    $arguments = "& '" + $myinvocation.mycommand.definition + "'"
+    Start-Process powershell -Verb runAs -ArgumentList $arguments
+    Write-Log -Message "Elevation request sent. Exiting current process." -LogLevel INF
+    Break
+}
+Write-Log -Message "Running with elevated privileges." -LogLevel INF
+
+#####################################################################
 
 $rootPath = Join-Path $env:USERPROFILE ".cfg"
 $userPath = $env:USERPROFILE
-
 
 #region directories
 Write-Log -Message "(1/4) Starting directory setup ..." -LogLevel INF
 
 $cfgPath = New-CfgDirectory -FolderName $rootPath
-New-CfgDirectory -FolderName (Join-Path $cfgPath "tools")
+$toolsPath = New-CfgDirectory -FolderName (Join-Path $cfgPath "tools")
+New-CfgDirectory -FolderName (Join-Path $toolsPath "7zip")
+New-CfgDirectory -FolderName (Join-Path $toolsPath "bruno")
 New-CfgDirectory -FolderName (Join-Path $cfgPath "misc/backgrounds")
 New-CfgDirectory -FolderName (Join-Path $cfgPath "pwsh/modules")
 New-CfgDirectory -FolderName (Join-Path $cfgPath "pwsh/latest")
 
 #endregion directories
 
-
+#####################################################################
 
 #region tools
 Write-Log -Message "(2/4) Starting tool setup ..." -LogLevel INF
@@ -336,14 +391,15 @@ winget install -e --id OpenJS.NodeJS.LTS
 winget install -e --id Microsoft.WindowsTerminal.Preview
 winget install -e --id Microsoft.PowerToys
 winget install fastfetch
-winget install Starship.Starship
-winget install --id GitHub.cli
+winget install -e --id Starship.Starship
+winget install -e --id GitHub.cli
 winget install -e --id Git.Git
 winget install -e --id Microsoft.VisualStudioCode
-
+winget install -e --id Microsoft.AzureCLI
+winget install -e --id Microsoft.Azure.FunctionsCoreTools
 #endregion tools
 
-
+#####################################################################
 
 #region post-install
 Write-Log -Message "(3/4) Starting post-installation tasks ..." -LogLevel INF
@@ -360,12 +416,23 @@ Install-NerdFont `
 Write-Log -Message "Setting env variables ..." -LogLevel INF
 Invoke-SetEnvVariables
 
-[Environment]::SetEnvironmentVariable("OPENROUTER_API_KEY", "", "User")
-[Environment]::SetEnvironmentVariable("COGNIGY_API_KEY", "", "User")
-[Environment]::SetEnvironmentVariable("ANTHROPIC_API_KEY", "", "User")
-[Environment]::SetEnvironmentVariable("OPENAI_API_KEY", "", "User")
+Import-DotEnv -Path (Join-Path $PSScriptRoot ".env")
 
+[Environment]::SetEnvironmentVariable("OPENROUTER_API_KEY", $env:OPENROUTER_API_KEY, "User")
+[Environment]::SetEnvironmentVariable("COGNIGY_API_KEY", $env:COGNIGY_API_KEY, "User")
+[Environment]::SetEnvironmentVariable("ANTHROPIC_API_KEY", $env:ANTHROPIC_API_KEY, "User")
+[Environment]::SetEnvironmentVariable("OPENAI_API_KEY", $env:OPENAI_API_KEY, "User")
+[Environment]::SetEnvironmentVariable("PROJECTS_HOME", "$env:USERPROFILE\projects", "User")
 
+mkdir "$env:USERPROFILE\projects" -Force | Out-Null
+mkdir "$env:USERPROFILE\projects\python" -Force | Out-Null
+mkdir "$env:USERPROFILE\projects\csharp" -Force | Out-Null
+mkdir "$env:USERPROFILE\projects\web" -Force | Out-Null
+mkdir "$env:USERPROFILE\projects\go" -Force | Out-Null
+mkdir "$env:USERPROFILE\projects\rust" -Force | Out-Null
+#endregion post-install
+
+#####################################################################
 
 #region cfgs
 Write-Log -Message "(4/4) Starting configuration ..." -LogLevel INF
@@ -378,6 +445,6 @@ New-Item -ItemType SymbolicLink `
 New-Item -ItemType SymbolicLink `
     -Path "$LOCALAPPDATA\fastfetch\config.jsonc" `
     -Target "$HOME\projects\dotfiles\fastfetch\config.jsonc"
-#endregion post-install
-
 #endregion cfgs
+
+#####################################################################

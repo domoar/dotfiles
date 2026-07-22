@@ -1,0 +1,82 @@
+[user]
+    name = LastName, FirstName
+    email = name@mail.com
+    signingkey = <SSH KEY mount from DevOps>
+
+[init]
+    defaultBranch = main
+
+[gpg]
+    format = ssh
+
+[gpg "ssh"]
+    allowedSignersFile = ~/.ssh/allowed_signers
+
+[alias]
+    st = status
+    co = checkout
+    br = branch
+    com = commit
+    lg = log --oneline --graph --all --decorate
+    lgp = log --graph --all --decorate --pretty=format:"%C(yellow)%h%Creset - %Cgreen%ad%Creset %C(auto)%d%Creset %s" --date=short --abbrev-commit
+
+[pull]
+    rebase = true
+
+[rebase]
+    autoSquash = true
+    autoStash = true
+    updateRefs = true
+
+[diff]
+    tool = tkdiff
+    algorithm = histogram
+    mnemonicPrefix = true
+    renames = true
+    colorMoved = plain
+
+[help]
+    autocorrect = prompt
+
+[core]
+    commitGraph = true
+    fsmonitor = true
+    untrackedCache = true
+    editor = code --wait
+    autocrlf = input
+    fileMode = false
+
+[commit]
+    gpgSign = true
+    verbose = true
+
+[color]
+    ui = auto
+
+[rerere]
+    enabled = true
+
+[fetch]
+    prune = true
+    pruneTags = true
+    all = true
+    verbose = true
+
+[merge]
+    tool = tkdiff
+    # (just 'diff3' if git version < 2.3)
+    conflictstyle = zdiff3
+
+[push]
+    default = simple
+    autoSetupRemote = true
+    followTags = true
+
+[column]
+    ui = auto
+
+[branch]
+    sort = -committerdate
+
+[tag]
+    sort = version:refname

@@ -1,106 +1,54 @@
 <#
 .SYNOPSIS
-Opens File Explorer at the current PowerShell location.
+Writes a timestamped, color-coded log message to the console.
+
+.PARAMETER Message
+The message text to write to the console.
+
+.PARAMETER LogLevel
+The severity level for the log entry. Valid values are TRC, DBG, INF, WRN, ERR, and CRI. Defaults to INF.
 
 .USAGE
-OpenFileExplorer
-fe
+Write-Log -Message "Starting setup" -LogLevel INF
+Write-Log -Message "Something failed" -LogLevel ERR
 #>
-function OpenFileExplorer {
-    $currentPath = Get-Location
-    Start-Process explorer.exe $currentPath
-}
-Export-ModuleMember -Function OpenFileExplorer -Alias fe
-
-#####################################################################
-
-<#
-.SYNOPSIS
-Moves up one or more parent directories from the current location.
-
-.PARAMETER -Levels
-The number of directory levels to move up. Defaults to 1.
-
-.USAGE
-GoUpNDirectories -Levels 2
-up 2
-#>
-function GoUpNDirectories {
-    param(
-        [Parameter(Position = 0)]
-        [int]$Levels = 1
-    )
-
-    if ($Levels -lt 1) {
-        Write-Log -Message "Levels must be >= 1" -LogLevel ERR
-        return
-    }
-    $path = (1..$Levels | ForEach-Object { ".." }) -join [IO.Path]::DirectorySeparatorChar
-    Set-Location $path
-}
-Export-ModuleMember -Function GoUpNDirectories -Alias up
-
-#####################################################################
-
-<#
-.SYNOPSIS
-Copies a file path to the clipboard after verifying that it exists.
-
-.PARAMETER -Path
-The file or folder path to copy to the clipboard.
-
-.USAGE
-scop .\README.md
-Get-Item .\README.md | ForEach-Object { scop $_.FullName }
-#>
-function scop {
+function Write-Log {
+    [CmdletBinding()]
     param (
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, Position = 0)]
-        [string]$Path
+        [Parameter(Mandatory)]
+        [AllowEmptyString()]
+        [string]$Message,
+
+        [ValidateSet('TRC', 'DBG', 'INF', 'WRN', 'ERR', 'CRI')]
+        [string]$LogLevel = 'INF'
     )
-    if (Test-Path $Path) {
-        Set-Clipboard -Path $Path
-        Write-Log -Message "File '$Path' copied to clipboard" -LogLevel INF
+
+    $timestamp = Get-Date -Format 'yyyy-MM-ddTHH:mm:ss.fffK'
+    $computerName = $env:COMPUTERNAME
+    $processId = $PID
+
+    $logEntry = '[{0}] [{1}] [{2}] [PID:{3}] {4}' -f `
+        $timestamp,
+    $LogLevel.ToUpperInvariant(),
+    $computerName,
+    $processId,
+    $Message
+
+    $foregroundColor = switch ($LogLevel) {
+        'TRC' { 'DarkGray' }
+        'DBG' { 'Gray' }
+        'INF' { 'Green' }
+        'WRN' { 'Yellow' }
+        'ERR' { 'Red' }
+        'CRI' { 'Magenta' }
     }
-    else {
-        Write-Log -Message "File '$Path' does not exist" -LogLevel ERR
-    }
+
+    Write-Host $logEntry -ForegroundColor $foregroundColor
 }
-Export-ModuleMember -Function scop
+Export-ModuleMember -Function Write-Log
 
 #####################################################################
 
-<#
-.SYNOPSIS
-Starts the Windows SlideToShutDown experience and exits the current session.
-
-.USAGE
-SlideToShutDown
-conexit
-#>
-function SlideToShutDown {
-    Write-Log -Message "Init shutdown ..." -LogLevel ERR
-    Start-Process "C:\Windows\System32\SlideToShutDown.exe"
-    exit
-}
-Export-ModuleMember -Function SlideToShutDown -Alias conexit
-
-#####################################################################
-
-<#
-.SYNOPSIS
-Opens the PowerShell command history file in Visual Studio Code.
-
-.USAGE
-OpenPsHistory
-history
-#>
-function OpenPsHistory {
-    code (Get-PSReadlineOption).HistorySavePath
-}
-Export-ModuleMember -Function OpenPsHistory -Alias history
-
-#####################################################################
 
 <#
 .SYNOPSIS
@@ -186,7 +134,7 @@ function PackFileWith7Zip {
 
     $zipPath = "C:\Program Files\7-Zip\7z.exe"
     if (!(Test-Path $SourcePath)) {
-        Write-Warning "Source path '$SourcePath' not found."
+        Write-Log -Message "Source path '$SourcePath' not found." -LogLevel ERR
         return
     }
 
@@ -195,46 +143,6 @@ function PackFileWith7Zip {
     Write-Log -Message "File '$SourcePath' packed to '$DestinationPath'." -LogLevel INF
 }
 Export-ModuleMember -Function PackFileWith7Zip -Alias pack
-
-#####################################################################
-
-<#
-.SYNOPSIS
-Changes the current location to the user's Visual Studio repositories folder.
-
-.USAGE
-GoToVisualStudioRepos
-repos
-vsrepos
-#>
-function GoToVisualStudioRepos {
-    $username = $env:USERNAME
-    $path = "C:\Users\$username\source\repos"
-    
-    if (Test-Path $path) {
-        Set-Location $path
-        Write-Log -Message "Opening VisualStudio repositories @ $path" -LogLevel INF
-    }
-    else {
-        Write-Log -Message "VisualStudio repositories @ $path not found!" -LogLevel WRN
-    }
-}
-Export-ModuleMember -Function GoToVisualStudioRepos -Alias repos, vsrepos
-
-#####################################################################
-
-<#
-.SYNOPSIS
-Shows a decorated git commit graph for all branches.
-
-.USAGE
-GetGitLog
-ggl
-#>
-function GetGitLog {
-    git log --graph --all --decorate --pretty=format:"%C(yellow)%h%Creset - %Cgreen%ad%Creset %C(auto)%d%Creset %s" --date=short
-}
-Export-ModuleMember -Function GetGitLog -Alias ggl
 
 #####################################################################
 
@@ -357,6 +265,33 @@ Export-ModuleMember -Function Show-Tree -Alias tr
 
 <#
 .SYNOPSIS
+Copies an environment variable to the clipboard if it exists.
+
+.USAGE
+Copy-EnvironmentVariablesToClipboard -Name "ENV_VAR_NAME"
+cenv "ENV_VAR_NAME" can be upper-,lower-case or mixed case
+#>
+function Copy-EnvironmentVariablesToClipboard {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
+    $value = [System.Environment]::GetEnvironmentVariable($Name)
+    if ($value) {
+        Set-Clipboard -Value $value
+        Write-Log -Message "Environment variable '$Name' copied to clipboard." -LogLevel INF
+    }
+    else {
+        Write-Log -Message "Environment variable '$Name' does not exist." -LogLevel WRN
+    }
+}
+Export-ModuleMember -Function Copy-EnvironmentVariablesToClipboard -Alias copyenv, cenv, copenv
+
+#####################################################################
+
+<#
+.SYNOPSIS
 Lists running WSL instances and optionally shuts them all down.
 
 .USAGE
@@ -364,6 +299,12 @@ Stop-RunningWSL
 exvirt
 #>
 function Stop-RunningWSL {
+
+    if (-not (Get-Command wsl -ErrorAction SilentlyContinue)) {
+        Write-Log -Message "WSL is not installed. Install WSL before running this command" -LogLevel ERR
+        exit 1
+    }
+
     $running = wsl --list --running 2>$null | Select-Object -Skip 1 | Where-Object { $_.Trim() -ne "" }
 
     if (-not $running) {
@@ -397,31 +338,292 @@ Start-ElevatedTerminal
 elevate
 #>
 function Start-ElevatedTerminal {
+    if (-not (Get-Command wt -ErrorAction SilentlyContinue)) {
+        Write-Log -Message "Windows Terminal is not installed. Install Windows Terminal before running this command" -LogLevel ERR
+        exit 1
+    }
     Start-Process wt.exe -Verb RunAs -ArgumentList "-p `"PowerShell`""
 }
-Export-ModuleMember -Function Start-ElevatedTerminal -Alias elevate
+Export-ModuleMember -Function Start-ElevatedTerminal -Alias elevate, asadmin, asad
+
+#####################################################################
 
 <#
 .SYNOPSIS
-Copies an environment variable to the clipboard if it exists.
+Opens the PowerShell command history file in Visual Studio Code.
 
 .USAGE
-Copy-EnvironmentVariablesToClipboard -Name "ENV_VAR_NAME"
-cenv "ENV_VAR_NAME" can be upper-,lower-case or mixed case
+OpenPsHistory
+history
 #>
-function Copy-EnvironmentVariablesToClipboard {
-    param (
-        [Parameter(Mandatory = $true)]
-        [string]$Name
+function OpenPsHistory {
+    if (-not (Get-Command code -ErrorAction SilentlyContinue)) {
+        Write-Log -Message "Visual Studio Code is not installed. Install Visual Studio Code before running this command" -LogLevel ERR
+        exit 1
+    }
+    code (Get-PSReadlineOption).HistorySavePath
+}
+Export-ModuleMember -Function OpenPsHistory -Alias history, hist
+
+#####################################################################
+
+<#
+.SYNOPSIS
+Opens File Explorer at the current PowerShell location.
+
+.USAGE
+OpenFileExplorer
+fe
+#>
+function OpenFileExplorer {
+    $currentPath = Get-Location; Start-Process explorer.exe $currentPath
+    # or """explorer .""" / $currentPath = pwd; Start-Process explorer.exe $currentPath
+}
+Export-ModuleMember -Function OpenFileExplorer -Alias fe
+
+#####################################################################
+
+<#
+.SYNOPSIS
+Moves up one or more parent directories from the current location.
+
+.PARAMETER -Levels
+The number of directory levels to move up. Defaults to 1.
+
+.USAGE
+GoUpNDirectories -Levels 2
+up 2
+#>
+function GoUpNDirectories {
+    param(
+        [Parameter(Position = 0)]
+        [int]$Levels = 1
     )
 
-    $value = [System.Environment]::GetEnvironmentVariable($Name)
-    if ($value) {
-        Set-Clipboard -Value $value
-        Write-Log -Message "Environment variable '$Name' copied to clipboard." -LogLevel INF
+    if ($Levels -lt 1) {
+        Write-Log -Message "Levels must be >= 1" -LogLevel ERR
+        return
+    }
+    $path = (1..$Levels | ForEach-Object { ".." }) -join [IO.Path]::DirectorySeparatorChar
+    Set-Location $path
+}
+Export-ModuleMember -Function GoUpNDirectories -Alias up
+
+#####################################################################
+
+<#
+.SYNOPSIS
+Copies a file path to the clipboard after verifying that it exists.
+
+.PARAMETER -Path
+The file or folder path to copy to the clipboard.
+
+.USAGE
+scop .\README.md
+Get-Item .\README.md | ForEach-Object { scop $_.FullName }
+#>
+function scop {
+    param (
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true, Position = 0)]
+        [string]$Path
+    )
+    if (Test-Path $Path) {
+        Set-Clipboard -Path $Path
+        Write-Log -Message "File '$Path' copied to clipboard" -LogLevel INF
     }
     else {
-        Write-Log -Message "Environment variable '$Name' does not exist." -LogLevel WRN
+        Write-Log -Message "File '$Path' does not exist" -LogLevel ERR
     }
 }
-Export-ModuleMember -Function Copy-EnvironmentVariablesToClipboard -Alias cenv
+Export-ModuleMember -Function scop
+
+#####################################################################
+
+<#
+.SYNOPSIS
+Starts the Windows SlideToShutDown experience and exits the current session.
+
+.USAGE
+SlideToShutDown
+conexit
+#>
+function SlideToShutDown {
+    Write-Log -Message "Init shutdown ..." -LogLevel INF
+    Start-Process "C:\Windows\System32\SlideToShutDown.exe"
+    exit
+}
+Export-ModuleMember -Function SlideToShutDown -Alias conexit, cexit, cex
+
+#####################################################################
+
+<#
+.SYNOPSIS
+Removes stopped Docker containers using Docker's prune command.
+
+.USAGE
+DockerContainerPrune
+dcp
+#>
+function DockerContainerPrune {
+    if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
+        Write-Log -Message "Docker CLI is not installed. Install Docker before running this command" -LogLevel ERR
+        exit 1
+    }
+    docker container prune
+}
+Export-ModuleMember -Function DockerContainerPrune -Alias dcp
+
+#####################################################################
+
+<#
+.SYNOPSIS
+Removes unused Docker images using Docker's prune command.
+
+.USAGE
+DockerImagePrune
+dip
+#>
+function DockerImagePrune {
+    if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
+        Write-Log -Message "Docker CLI is not installed. Install Docker before running this command" -LogLevel ERR
+        exit 1
+    }
+    docker image prune
+}
+Export-ModuleMember -Function DockerImagePrune -Alias dip
+
+#####################################################################
+
+<#
+.SYNOPSIS
+Stops and removes containers, networks, and default resources for the current Docker Compose project.
+
+.USAGE
+DockerComposeDown
+dcd
+#>
+function DockerComposeDown {
+    if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
+        Write-Log -Message "Docker CLI is not installed. Install Docker before running this command" -LogLevel ERR
+        exit 1
+    }
+    docker compose down
+}
+Export-ModuleMember -Function DockerComposeDown -Alias dcd
+
+#####################################################################
+
+<#
+.SYNOPSIS
+Starts the current Docker Compose project.
+
+.USAGE
+DockerComposeUp
+dcu
+#>
+function DockerComposeUp {
+    if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
+        Write-Log -Message "Docker CLI is not installed. Install Docker before running this command" -LogLevel ERR
+        exit 1
+    }
+    docker compose up
+}
+Export-ModuleMember -Function DockerComposeUp -Alias dcu
+
+#####################################################################
+
+<#
+.SYNOPSIS
+Starts Docker Desktop.
+
+.USAGE
+DockerDesktopStart
+dockerstart
+#>
+function DockerDesktopStart {
+    if (-not (Get-Command docker desktop -ErrorAction SilentlyContinue)) {
+        Write-Log -Message "Docker Desktop is not installed. Install Docker Desktop before running this command" -LogLevel ERR
+        exit 1
+    }
+    docker desktop start
+}
+Export-ModuleMember -Function DockerDesktopStart -Alias dockerstart
+
+#####################################################################
+
+<#
+.SYNOPSIS
+Stops Docker Desktop.
+
+.USAGE
+DockerDesktopStop
+dockerstop
+#>
+function DockerDesktopStop {
+    if (-not (Get-Command docker desktop -ErrorAction SilentlyContinue)) {
+        Write-Log -Message "Docker Desktop is not installed. Install Docker Desktop before running this command" -LogLevel ERR
+        exit 1
+    }
+    docker desktop stop
+}
+Export-ModuleMember -Function DockerDesktopStop -Alias dockerstop
+
+#####################################################################
+
+<#
+.SYNOPSIS
+Changes the current location to the user's Visual Studio repositories folder.
+
+.USAGE
+GoToVisualStudioRepos
+repos
+vsrepos
+#>
+function GoToVisualStudioRepos {
+    $username = $env:USERNAME
+    $path = "C:\Users\$username\source\repos"
+    
+    if (Test-Path $path) {
+        Set-Location $path
+        Write-Log -Message "Opening VisualStudio repositories @ $path" -LogLevel INF
+    }
+    else {
+        Write-Log -Message "VisualStudio repositories @ $path not found!" -LogLevel WRN
+    }
+}
+Export-ModuleMember -Function GoToVisualStudioRepos -Alias repos, vsrepos
+
+#####################################################################
+
+<#
+.SYNOPSIS
+Changes the current location to the user's Visual Studio repositories folder.
+
+.USAGE
+GoToVisualStudioRepos
+repos
+vsrepos
+#>
+function GoToProjectsHome {
+
+    # If ENV PROJECTS_HOME is set use it 
+
+    $username = $env:USERNAME
+    $path = if ([string]::IsNullOrWhiteSpace($env:PROJECTS_HOME)) {
+        "C:\Users\$username\projects"
+    }
+    else {
+        $env:PROJECTS_HOME
+    }
+    
+    if (Test-Path $path) {
+        Set-Location $path
+        Write-Log -Message "Opening VisualStudio repositories @ $path" -LogLevel INF
+    }
+    else {
+        Write-Log -Message "VisualStudio repositories @ $path not found!" -LogLevel WRN
+    }
+}
+Export-ModuleMember -Function GoToVisualStudioRepos -Alias repos, vsrepos
+
+#####################################################################
