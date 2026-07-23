@@ -69,4 +69,6 @@ protobuf https://buf.build/product/cli
 
 https://www.tinytooltown.com/tools/splitpanefix/
 https://codingfreaks.de/terminal-progress/
+https://learn.microsoft.com/de-de/windows/terminal/tutorials/shell-integration
 
+https://github.com/tealdeer-rs/tealdeer
