@@ -7,9 +7,11 @@ Import-Module Terminal-Icons
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
 Set-PSReadLineOption -PredictionSource History
-Set-PSReadLineOption -PredictionViewStyle ListView
+# Set-PSReadLineOption -PredictionViewStyle ListView
+Set-PSReadLineOption -PredictionViewStyle InlineView
 Set-PSReadLineOption -EditMode Windows
 Set-PSReadLineOption -BellStyle None
+Set-PSReadLineOption -PredictionSource HistoryAndPlugin
 Set-PSReadLineOption -MaximumHistoryCount 10000
 Set-PSReadLineOption -AddToHistoryHandler {
     param([string]$line)
@@ -20,22 +22,22 @@ Set-PSReadLineOption -AddToHistoryHandler {
 
 
 Set-PSReadLineOption -Colors @{
-    "Command"                = 'Green'
-    "Parameter"              = 'White'
-    "String"                 = 'White'
-    "Operator"               = 'White'
-    "Variable"               = 'White'
-    "Type"                   = 'White'
-    "Number"                 = 'White'
-    "Member"                 = 'White'
-    "Comment"                = 'White'
-    "Keyword"                = 'White'
-    "Error"                  = 'White'
-    "Emphasis"               = 'White'
-    "InlinePrediction"       = 'White'
-    "ListPrediction"         = 'White'
-    "ListPredictionSelected" = 'White'
-    "Default"                = 'White'
+    "Command"                = 'White' # cd
+    "Parameter"              = 'White' # curl -l -o
+    "String"                 = 'White' # curl -v "https://www.google.com"
+    "Operator"               = 'White' # (Get-Item .\Untitled-1.json).Count -gt 10 (-gt)
+    "Variable"               = 'White' #  $env:PATH
+    "Type"                   = 'White' # $basic = [Convert]::ToBase64String([Text.Encoding] (convert)
+    "Number"                 = 'White' # $num = 14 (14)
+    "Member"                 = 'White' # $basic = [Convert]::ToBase64String([Text.Encoding] (ToBase64String))
+    "Comment"                = 'White' # # this is a comment
+    "Keyword"                = 'White' # if else
+    "Error"                  = 'White' # unclear
+    "Emphasis"               = 'White' # Prediction text
+    "InlinePrediction"       = 'Green' # for InlineView
+    "ListPrediction"         = 'White' # for ListView
+    "ListPredictionSelected" = 'White' # for ListView
+    "Default"                = 'White' # 
 }
 
 # This is an example profile for PSReadLine.
