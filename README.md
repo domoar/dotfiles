@@ -1,3 +1,5 @@
+# README
+
 TODO Make env
 
 Modules technically require manifests """New-ModuleManifest -Path "$HOME\Documents\PowerShell\Modules\MyTools\MyTools.psd1" `
