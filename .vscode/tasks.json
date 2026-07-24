@@ -1,1 +1,25 @@
-{}
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Echo shell example",
+      "type": "shell",
+      "command": "echo",
+      "args": ["Do something"],
+      "windows": { "command": "echo", "args": ["Do something on Windows"] },
+      "linux": { "command": "echo", "args": ["Do something on Linux"] },
+      "osx": { "command": "echo", "args": ["Do something on macOS"] },
+      "problemMatcher": []
+    },
+    {
+      "label": "Git status process example",
+      "type": "process",
+      "command": "git",
+      "args": ["status"],
+      "windows": { "command": "git", "args": ["status"] },
+      "linux": { "command": "git", "args": ["status"] },
+      "osx": { "command": "git", "args": ["status"] },
+      "problemMatcher": []
+    }
+  ]
+}
