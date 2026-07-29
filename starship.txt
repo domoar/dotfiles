@@ -261,39 +261,3 @@ time_format = "%R"                                    # Hour:Minute Format
 style = "bg:#1d2230"
 format = '[[ $time ](fg:#ffffff bg:#1d2230)]($style)'
 utc_time_offset = 'Europe/Berlin'
-
-[username]
-show_always = true
-style_user = "bg:surface0 fg:text"
-style_root = "bg:surface0 fg:text"
-format = '[ $user ]($style)'
-aliases = { "DEME" = "me" }
-
-
-[line_break]
-disabled = false
-
-[character]
-disabled = false
-success_symbol = '[>](bold fg:color_green)'
-error_symbol = '[>](bold fg:color_red)'
-
-[java]
-[gradle]
-
-[custom.foo]
-command = 'echo foo'                       # shows output of command
-detect_files = ['foo']                     # can specify filters but wildcards are not supported
-when = ''' test "$HOME" = "$PWD" '''
-format = ' transcending [$output]($style)'
-
-[custom.time]
-command = 'time /T'
-detect_extensions = ['pst']                         # filters *.pst files
-shell = ['pwsh.exe', '-NoProfile', '-Command', '-']
-
-[custom.time-as-arg]
-command = 'time /T'
-detect_extensions = ['pst']                    # filters *.pst files
-shell = ['pwsh.exe', '-NoProfile', '-Command']
-use_stdin = false
