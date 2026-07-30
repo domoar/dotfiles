@@ -92,3 +92,5 @@ Get-ChildItem $args -Exclude .*  | Format-Wide Name -AutoSize
 ```
 
 TODO @Starship add claude
+export STARSHIP_CONFIG=/mnt/c/Users/?/.config/starship/starship.toml
+eval "$(starship init bash)"
