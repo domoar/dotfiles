@@ -74,3 +74,21 @@ https://codingfreaks.de/terminal-progress/
 https://learn.microsoft.com/de-de/windows/terminal/tutorials/shell-integration
 
 https://github.com/tealdeer-rs/tealdeer
+
+### GIT LS
+
+```bash
+if ($host.Name -eq 'ConsoleHost')
+{
+    function ls_git { & 'C:\Program Files\Git\usr\bin\ls' --color=auto -hF $args }
+    Set-Alias -Name ls -Value ls_git -Option Private
+}
+```
+
+or
+
+```powershell
+Get-ChildItem $args -Exclude .*  | Format-Wide Name -AutoSize
+```
+
+TODO @Starship add claude
