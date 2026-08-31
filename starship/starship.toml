@@ -3,68 +3,146 @@
 add_newline = true
 
 format = """
+$os\
 $username@\
 $hostname\
 $directory\
 $git_branch\
+$git_commit\
 $git_status\
 $dotnet\
 $python\
+$time\
 \n$character"""
 
+palette = 'custom'
+
+[palettes.custom]
+color_red = "#cc241d"
+color_green = "#33981a"
+aws_color = "#FF9900"
+azure_color = "#0078D4"
+buf_color = "#4A44F2"
+bun_color = "#FBF0DF"
+c_color = "#A8B9CC"
+cmake_color = "#064F8C"
+cpp_color = "#00599C"
+docker_color = "#2496ED"
+dotnet_color = "#512BD4"
+gcloud_color = "#4285F4"
+git_color = "#F05032"
+go_color = "#00ADD8"
+gradle_color = "#02303A"
+helm_color = "#0F1689"
+java_color = "#007396"
+kubernetes_color = "#326CE5"
+lua_color = "#2C2D72"
+maven_color = "#C71A36"
+nodejs_color = "#339933"
+python_color = "#3776AB"
+# python_color = "#FFD43B"
+rlang_color = "#276DC3"
+rust_color = "#CE422B"
+terraform_color = "#7B42BC"
+
 [aws]
-symbol = "\ue7ad"
+symbol = "\uf0e0f"
 format = '\[[$symbol($profile)(\($region\))(\[$duration\])]($style)\]'
-style = "orange"
+style = 'aws_color'
+[aws.profile_aliases]
+very-long-profile-name = 'vlpn'
+[aws.region_aliases]
+eu-central-1 = 'EUW-FRA'
+eu-central-2 = 'EUW-LHR'
+us-east-1 = 'USE-IAD'
+us-east-2 = 'USE-CLE'
+us-west-1 = 'USW-SFO'
+us-west-2 = 'USW-PDX'
 
 [azure]
-symbol = "\ue754"
-format = '\[[$symbol($subscription)]($style)\]'
-style = "blue"
+symbol = "\uf0805"
+format = '\[[$symbol ($subscription)]($style)\]'
+style = "azure_color"
+disabled = false
+[azure.subscription_aliases]
+very-long-subscription-name = 'vlsn'
 
 [buf]
+symbol = "\uf0fd8"
 format = '\[[$symbol($version)]($style)\]'
-style = "blue"
+style = 'buf_color'
+detect_extensions = []
+detect_files = []
+detect_folders = []
 
 [bun]
+symbol = "\uE76F"
 format = '\[[$symbol($version)]($style)\]'
-style = "red"
+style = 'bun_color'
+detect_extensions = []
+detect_files = []
+detect_folders = []
 
 [c]
-symbol = "\ue771"
+symbol = "\uf0671"
 format = '\[[$symbol($version(-$name))]($style)\]'
-style = "blue"
+style = 'c_color'
+detect_extensions = []
+detect_files = []
+detect_folders = []
+commands = []
 
 [cmake]
 symbol = "\ue794"
 format = '\[[$symbol($version)]($style)\]'
-style = "blue"
+style = 'cmake_color'
+detect_extensions = []
+detect_files = []
+detect_folders = []
+
+[cpp]
+symbol = "\uf0672"
+format = '\[[$symbol($version(-$name))]($style)\]'
+style = 'cpp_color'
+detect_extensions = []
+detect_files = []
+detect_folders = []
+commands = []
 
 [cmd_duration]
 format = '\[[took $duration]($style)\]'
-style = "gray"
+style = 'gray'
+show_milliseconds = true
+show_notifications = true
 
 [container]
 format = '\[[$symbol \[$name\]]($style)\]'
-style = "cyan"
+style = 'gray'
 
-[cpp]
-format = '\[[$symbol($version(-$name))]($style)\]'
-style = "blue"
+[directory]
+style = "#769ff0"
+format = '\[[$path]($style)\]'
+truncation_length = 5
+truncation_symbol = '../'
+use_os_path_sep = true
+home_symbol = '~'
 
 [direnv]
 format = '\[[$symbol$loaded/$allowed]($style)\]'
-style = "orange"
+style = 'gray'
 
 [docker_context]
-symbol = "\ue7b0"
+symbol = "\uf0868"
 format = '\[[$symbol$context]($style)\]'
-style = "cyan"
+style = 'docker_color'
+detect_extensions = []
+detect_files = []
+detect_folders = []
 
 [dotnet]
-symbol = "\ue77f"
+symbol = "\uf031b"
 format = '\[[$symbol ($version)($tfm)]($style)\]'
-style = "purple"
+style = 'dotnet_color'
 detect_extensions = ['csproj', 'fsproj', 'xproj', 'sln', 'slnx']
 detect_files = [
     'global.json',
@@ -77,120 +155,161 @@ detect_folders = []
 heuristic = true
 
 [gcloud]
-symbol = "\ue7f1"
+symbol = "\uE7F1"
 format = '\[[$symbol$account(@$domain)(\($region\))]($style)\]'
-style = "blue"
+style = 'gcloud_color'
+[gcloud.project_aliases]
+very-long-project-name = 'avlpn'
+[gcloud.region_aliases]
+europe-west3-a = 'EUW-FRA'
+europe-west3-b = 'EUW-FRA'
+europe-west3-c = 'EUW-FRA'
+us-west2-a = 'USW-LAX'
+us-west2-b = 'USW-LAX'
+us-west2-c = 'USW-LAX'
+us-west1-a = 'USW-SFO'
+us-west1-b = 'USW-SFO'
+us-west1-c = 'USW-SFO'
+northamerica-northeast1-a = 'NAM-YUL'
+northamerica-northeast1-b = 'NAM-YUL'
+northamerica-northeast1-c = 'NAM-YUL'
+northamerica-northeast2-a = 'NAM-YYZ'
+northamerica-northeast2-b = 'NAM-YYZ'
+northamerica-northeast2-c = 'NAM-YYZ'
 
 [git_branch]
-symbol = "\ue725"
-format = '\[[$symbol $branch]($style)\]'
-style = "purple"
+# format = '\[[$symbol on $branch]($style)\]'
+format = '\[[$symbol $branch]($style)'
+style = 'git_color'
+symbol = "\ue702"
 
 [git_commit]
-# symbol = "\ue729"
-format = '\[[\($hash$tag\)]($style)\]'
-style = "green"
-
-[git_metrics]
-format = '\[[+$added]($added_style)\]\[[-$deleted]($deleted_style)\]'
-added_style = "green"
-deleted_style = "red"
-
-[git_state]
-format = '\[[$state ($progress_current/$progress_total)]($style)\]'
-style = "yellow"
+format = '[\(#$hash$tag\)]($style)\]'
+style = "git_color"
+only_detached = false
+tag_disabled = false
+tag_symbol = "\uf04f9"
+disabled = false
 
 [git_status]
-format = '([\[$all_status$ahead_behind\]]($style))'
-style = "red"
+format = '\[([$all_status$ahead_behind]($style))\]'
+style = "git_color"
+modified = 'M'
+untracked = '?'
+staged = '+'
+deleted = 'D'
+renamed = 'R'
+conflicted = '='
 
 [golang]
-symbol = "\ue7ef"
+symbol = "\uf07d3"
 format = '\[[$symbol($version)]($style)\]'
-style = "cyan"
+style = 'go_color'
 
 [gradle]
-symbol = "\ue7f2"
+symbol = "\uE7F2"
 format = '\[[$symbol($version)]($style)\]'
-style = "cyan"
+style = 'gradle_color'
 
 [helm]
-symbol = "\ue7fb"
+symbol = "\uE7FB"
 format = '\[[$symbol($version)]($style)\]'
-style = "gray"
+style = 'helm_color'
 
 [hostname]
-format = '\[[$ssh_symbol($hostname)]($style)\] '
+format = '[$ssh_symbol($hostname) ]($style)'
 ssh_only = false
-style = "white"
+style = 'gray'
 
 [java]
-symbol = "\ue738"
+symbol = "\uf0b37"
 format = '\[[$symbol($version)]($style)\]'
-style = "red"
+style = 'java_color'
 
 [kubernetes]
-symbol = "\ue81d"
+symbol = "\uf10fe"
 format = '\[[$symbol$context( \($namespace\))]($style)\]'
-style = "blue"
+style = 'kubernetes_color'
 
 [localip]
 format = '\[[$localipv4]($style)\]'
 style = "yellow"
 
 [lua]
-symbol = "\ue826"
+symbol = "\uf08b1"
 format = '\[[$symbol($version)]($style)\]'
-style = "blue"
+style = 'lua_color'
 
 [maven]
-symbol = "\ue82c"
+symbol = "\uE82C"
 format = '\[[$symbol($version)]($style)\]'
-style = "red"
-
-[memory_usage]
-format = '\[$symbol[$ram( | $swap)]($style)\]'
-style = "gray"
+style = 'maven_color'
 
 [nats]
 format = '\[[$symbol$name]($style)\]'
-style = "green"
+style = 'gray'
 
 [netns]
 format = '\[[$symbol \[$name\]]($style)\]'
-style = "gray"
+style = 'gray'
 
 [nodejs]
-symbol = "\ue718"
+symbol = "\uf0399"
 format = '\[[$symbol($version)]($style)\]'
-style = "green"
+style = 'nodejs_color'
+#symbol = "\U000F0626" json
 
 [os]
-format = '\[[$symbol]($style)\]'
-style = "blue"
+format = '[$symbol ]($style)'
+style = 'gray'
+disabled = false
+
+[os.symbols]
+Windows = "\ue8e5"
+Ubuntu = "\uf0548"
+Raspbian = "\ue722"
+Mint = "\uf08ed"
+Macos = "\uf0035"
+Linux = "\uf033d"
+Alpine = "\ue713"
+Arch = "\uf08c7"
+Debian = "\uf08da"
+Redhat = "\uf111b"
+RedHatEnterprise = "\uf111B"
 
 [package]
 format = '\[[$symbol$version]($style)\]'
 style = "orange"
 
 [python]
-symbol = "\ue73c"
-format = '\[[${symbol} ${pyenv_prefix}(${version})(\($virtualenv\))]($style)\]'
-style = "yellow"
+symbol = "\uf0320"
+format = '\[[${symbol} ${pyenv_prefix}(${version}) \(venv:$virtualenv\)]($style)\]'
+style = 'python_color'
+detect_extensions = ['py', 'ipynb']
+detect_files = [
+    'requirements.txt',
+    'pyproject.toml',
+    'setup.py',
+    'setup.cfg',
+    '__init__.py',
+]
+detect_folders = []
+generic_venv_names = ['.venv', 'venv']
+
 
 [rlang]
-symbol = "\ue881"
+symbol = "\uf07d4"
 format = '\[[$symbol ($version)]($style)\]'
-style = "blue"
+style = 'rlang_color'
 
 [rust]
-symbol = "\ue7a8"
+symbol = "\uf1617"
 format = '\[[$symbol($version)]($style)\]'
-style = "orange"
+style = 'rust_color'
 
 [shell]
 format = '\[[$indicator]($style)\]'
-style = "gray"
+style = 'shell_color'
 
 [status]
 format = '\[[$symbol$status]($style)\]'
@@ -201,41 +320,23 @@ format = '\[[as $symbol]($style)\]'
 style = "blue"
 
 [terraform]
-symbol = "\ue8bd"
+symbol = "\U000F1062"
 format = '\[[$symbol$workspace]($style)\]'
-style = "purple"
+style = 'terraform_color'
 
 [time]
-format = ' [$time]($style)'
+format = '\[[$time]($style)\]'
 disabled = false
-time_format = "%H:%M:%S"
+time_format = "%H:%M:%S UTC%:::z"
 style = "gray"
-utc_time_offset = 'Europe/Berlin'
+utc_time_offset = 'local'
 
 [username]
 format = '[$user]($style)'
 show_always = true
-style_user = "blue"
-style_root = "red"
-aliases = { "DEME" = "me" }
-
-[directory]
-format = "[$path ]($style)"
-truncation_length = 3
-truncation_symbol = "…/"
-
-[os.symbols]
-Windows = "󰍲"
-Ubuntu = "󰕈"
-Raspbian = "󰐿"
-Mint = "󰣭"
-Macos = "󰀵"
-Linux = "󰌽"
-Alpine = ""
-Arch = "󰣇"
-Debian = "󰣚"
-Redhat = "󱄛"
-RedHatEnterprise = "󱄛"
+style_user = 'white'
+style_root = 'red'
+aliases = { "MCDDESKTOP" = "MCDDESKTOP", "MCDLAPTOP" = "MCDLAPTOP" }
 
 [line_break]
 disabled = false
@@ -252,8 +353,15 @@ default = 'unknown shell'
 [env_var.USER]
 default = 'unknown user'
 
+[custom.dotnet-workspace]
+command = "dotnet --version"
+when = '[[ "$PWD" == *"/source/repos/"* ]]'
+symbol = "\uE77F"
+format = '\[[$symbol ($version)($tfm)]($style)\]'
+style = 'dotnet_color'
+
 # [custom.foo]
-# command = 'echo foo'                       # shows output of command
+# command = 'echo foo'                     # shows output of command
 # detect_files = ['foo']                     # can specify filters but wildcards are not supported
 # when = ''' test "$HOME" = "$PWD" '''
 # format = ' transcending [$output]($style)'
