@@ -135,7 +135,7 @@ function Invoke-SetEnvVariables {
         [PSCustomObject]@{ Name = "TEXLIVE_HOME"; Value = "%TOOLS_DIR%/texlive"; AddToPath = $true },
         [PSCustomObject]@{ Name = "PYTHON_HOME"; Value = "%TOOLS_DIR%/python"; AddToPath = $true },
         [PSCustomObject]@{ Name = "FONTS_DIR"; Value = Join-Path $rootPath "fonts"; AddToPath = $false },
-        [PSCustomObject]@{ Name = "7Z_HOME"; Value = Join-Path "%TOOLS_DIR%/7zip"; AddToPath = $false }
+        [PSCustomObject]@{ Name = "7Z_HOME"; Value = "%TOOLS_DIR%/7zip"; AddToPath = $false }
     )
 
     foreach ($entry in $envVars) {
@@ -256,17 +256,14 @@ Creates the directory C:\Users\<User>\.cfg.
 #>
 function New-CfgDirectory {
     param(
-        [Parameter(Mandatory = $true)]
-        [string]$FolderName
+        [Parameter(Mandatory)]
+        [string]$Path
     )
 
-    $rootPath = Join-Path $env:USERPROFILE $FolderName
+    New-Item -ItemType Directory -Force -Path $Path | Out-Null
+    Write-Log -Message "Created directory at $Path" -LogLevel INF
 
-    New-Item -ItemType Directory -Force -Path $rootPath | Out-Null
-
-    Write-Log -Message "Created root path at $rootPath" -LogLevel INF
-
-    return $rootPath
+    return $Path
 }
 
 function Install-LatestPowerShellZip {
@@ -346,6 +343,59 @@ function Import-DotEnv {
         [Environment]::SetEnvironmentVariable($key, $value, "Process")
     }
 }
+
+<#
+.SYNOPSIS
+Creates or replaces a symbolic link, safely and idempotently.
+
+.DESCRIPTION
+Creates a symbolic link at the specified path pointing to the specified target.
+If the target does not exist, the function logs a warning and skips creation
+rather than throwing. If the parent directory of the link path does not exist,
+it is created. If an item (file, folder, or stale link) already exists at the
+link path, it is removed before the new link is created, so the function is
+safe to call repeatedly across reruns of the setup script.
+
+.PARAMETER Path
+The path where the symbolic link should be created.
+
+.PARAMETER Target
+The path to the existing file or directory the symbolic link should point to.
+
+.EXAMPLE
+New-CfgSymlink `
+    -Path "$env:USERPROFILE\.config\starship.toml" `
+    -Target "$env:USERPROFILE\projects\dotfiles\starship\starship.toml"
+
+Links the user's starship config to the copy tracked in the dotfiles repo.
+#>
+function New-CfgSymlink {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [string]$Path,
+        [Parameter(Mandatory)]
+        [string]$Target
+    )
+
+    if (-not (Test-Path -LiteralPath $Target)) {
+        Write-Log -Message "Symlink target '$Target' does not exist. Skipping '$Path'." -LogLevel WRN
+        return
+    }
+
+    $parent = Split-Path -Path $Path -Parent
+    if (-not (Test-Path -LiteralPath $parent -PathType Container)) {
+        New-Item -ItemType Directory -Force -Path $parent | Out-Null
+    }
+
+    if (Test-Path -LiteralPath $Path) {
+        Remove-Item -LiteralPath $Path -Force
+        Write-Log -Message "Removed existing item at '$Path'." -LogLevel WRN
+    }
+
+    New-Item -ItemType SymbolicLink -Path $Path -Target $Target | Out-Null
+    Write-Log -Message "Linked '$Path' -> '$Target'." -LogLevel INF
+}
 #endregion helpers
 
 Write-Log -Message "Starting Windows setup ..." -LogLevel INF
@@ -366,13 +416,14 @@ $userPath = $env:USERPROFILE
 #region directories
 Write-Log -Message "(1/4) Starting directory setup ..." -LogLevel INF
 
-$cfgPath = New-CfgDirectory -FolderName $rootPath
-$toolsPath = New-CfgDirectory -FolderName (Join-Path $cfgPath "tools")
-New-CfgDirectory -FolderName (Join-Path $toolsPath "7zip")
-New-CfgDirectory -FolderName (Join-Path $toolsPath "bruno")
-New-CfgDirectory -FolderName (Join-Path $cfgPath "misc/backgrounds")
-New-CfgDirectory -FolderName (Join-Path $cfgPath "pwsh/modules")
-New-CfgDirectory -FolderName (Join-Path $cfgPath "pwsh/latest")
+$cfgPath = New-CfgDirectory -Path $rootPath
+$toolsPath = New-CfgDirectory -Path (Join-Path $cfgPath "tools")
+    
+New-CfgDirectory -Path (Join-Path $toolsPath "7zip")
+New-CfgDirectory -Path (Join-Path $toolsPath "bruno")
+New-CfgDirectory -Path (Join-Path $cfgPath "misc/backgrounds")
+New-CfgDirectory -Path (Join-Path $cfgPath "pwsh/modules")
+New-CfgDirectory -Path (Join-Path $cfgPath "pwsh/latest")
 
 #endregion directories
 
@@ -438,13 +489,14 @@ mkdir "$env:USERPROFILE\projects\rust" -Force | Out-Null
 Write-Log -Message "(4/4) Starting configuration ..." -LogLevel INF
 
 Write-Log -Message "Creating symlinks ..." -LogLevel INF
-New-Item -ItemType SymbolicLink `
-    -Path "$HOME\.config\starship.toml" `
-    -Target "$HOME\projects\dotfiles\starship\starship.toml"
 
-New-Item -ItemType SymbolicLink `
-    -Path "$LOCALAPPDATA\fastfetch\config.jsonc" `
-    -Target "$HOME\projects\dotfiles\fastfetch\config.jsonc"
+New-CfgSymlink `
+    -Path (Join-Path $env:USERPROFILE ".config\starship.toml") `
+    -Target (Join-Path $env:USERPROFILE "projects\dotfiles\starship\starship.toml")
+
+New-CfgSymlink `
+    -Path (Join-Path $env:LOCALAPPDATA "fastfetch\config.jsonc") `
+    -Target (Join-Path $env:USERPROFILE "projects\dotfiles\fastfetch\config.jsonc")
 #endregion cfgs
 
 #####################################################################

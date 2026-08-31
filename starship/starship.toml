@@ -41,7 +41,7 @@ format = '\[[$symbol($version)]($style)\]'
 style = "blue"
 
 [cmd_duration]
-format = '\[[⏱ $duration]($style)\]'
+format = '\[[took $duration]($style)\]'
 style = "gray"
 
 [container]
