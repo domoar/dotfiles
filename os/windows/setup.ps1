@@ -479,6 +479,10 @@ Import-DotEnv -Path (Join-Path $PSScriptRoot ".env")
 [Environment]::SetEnvironmentVariable("ANTHROPIC_API_KEY", $env:ANTHROPIC_API_KEY, "User")
 [Environment]::SetEnvironmentVariable("OPENAI_API_KEY", $env:OPENAI_API_KEY, "User")
 [Environment]::SetEnvironmentVariable("PROJECTS_HOME", "$env:USERPROFILE\projects", "User")
+[Environment]::SetEnvironmentVariable("XDG_CONFIG_HOME", "$env:USERPROFILE\.config", "User")
+[Environment]::SetEnvironmentVariable("XDG_DATA_HOME", "$env:USERPROFILE\.local\share", "User")
+[Environment]::SetEnvironmentVariable("XDG_CACHE_HOME", "$env:USERPROFILE\.cache", "User")
+
 
 mkdir "$env:USERPROFILE\projects" -Force | Out-Null
 mkdir "$env:USERPROFILE\projects\python" -Force | Out-Null
