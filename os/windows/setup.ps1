@@ -504,8 +504,12 @@ New-CfgSymlink `
     -Target (Join-Path $env:USERPROFILE "projects\dotfiles\starship\starship.toml")
 
 New-CfgSymlink `
-    -Path (Join-Path $env:LOCALAPPDATA "fastfetch\config.jsonc") `
-    -Target (Join-Path $env:USERPROFILE "projects\dotfiles\fastfetch\config.jsonc")
+    -Path (Join-Path $env:USERPROFILE ".config\fastfetch\fastfetch.jsonc") `
+    -Target (Join-Path $env:USERPROFILE "projects\dotfiles\fastfetch\fastfetch.jsonc")
+
+# New-CfgSymlink `
+#     -Path (Join-Path $env:LOCALAPPDATA "fastfetch\config.jsonc") `
+#     -Target (Join-Path $env:USERPROFILE "projects\dotfiles\fastfetch\config.jsonc")
 #endregion cfgs
 
 #####################################################################
