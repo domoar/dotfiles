@@ -8,25 +8,6 @@ Modules technically require manifests """New-ModuleManifest -Path "$HOME\Documen
 -AliasesToExport "fe" `
     -ModuleVersion "1.0.0""""
 
-TODO starhip porject recognizer
-
-```powershell
-mstsc.exe -v "<servername>"
-```
-
-```powershell
-start-process msedge -ArgumentList '--inprivate https://example.com'
-in 'PS C:\Program Files\BraveSoftware\Brave-Browser\Application>' .\brave --incognito "www.google.de" or add to PATH
-in 'PS C:\Program Files\Google\Chrome\Application>' .\chrome --incognito "www.google.de" or add to PATH
-```
-
-## Browser Extensions
-
-- SAML rcFed Tracer
-- Dark Reader
-- Session Buddy
-- Go Full Page
-
 ## GitConfig
 
 [REF](https://linux101.dev/git-commands/git-config/)
@@ -66,13 +47,10 @@ justcli
 justfile
 justextension
 
-terraform
-protobuf https://buf.build/product/cli
 
 https://www.tinytooltown.com/tools/splitpanefix/
 https://codingfreaks.de/terminal-progress/
 https://learn.microsoft.com/de-de/windows/terminal/tutorials/shell-integration
-
 https://github.com/tealdeer-rs/tealdeer
 
 ### GIT LS
@@ -90,7 +68,3 @@ or
 ```powershell
 Get-ChildItem $args -Exclude .*  | Format-Wide Name -AutoSize
 ```
-
-TODO @Starship add claude
-export STARSHIP_CONFIG=/mnt/c/Users/?/.config/starship/starship.toml
-eval "$(starship init bash)"

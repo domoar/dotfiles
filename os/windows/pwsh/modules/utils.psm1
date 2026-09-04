@@ -101,6 +101,7 @@ function UnpackFileWith7Zip {
     & $zipPath x "$ArchivePath" -o"$fullDestinationPath" -aoa -r
     Write-Log -Message "File '$ArchivePath' unpacked to '$fullDestinationPath'." -LogLevel INF
 }
+Set-Alias -Name unpack -Value UnpackFileWith7Zip
 Export-ModuleMember -Function UnpackFileWith7Zip -Alias unpack
 
 #####################################################################
@@ -142,6 +143,7 @@ function PackFileWith7Zip {
 
     Write-Log -Message "File '$SourcePath' packed to '$DestinationPath'." -LogLevel INF
 }
+Set-Alias -Name pack -Value PackFileWith7Zip
 Export-ModuleMember -Function PackFileWith7Zip -Alias pack
 
 #####################################################################
@@ -208,7 +210,7 @@ function Show-Tree {
         $name = Split-Path $Path -Leaf
         $prefix = ""
         for ($i = 0; $i -lt $ParentLastFlags.Count - 1; $i++) {
-            $prefix += $ParentLastFlags[$i] ? "    " : "│   "
+            $prefix += ($ParentLastFlags[$i] ? "    " : "│   ")
         }
 
         if ($Depth -eq 0) {
@@ -216,7 +218,7 @@ function Show-Tree {
         }
         else {
             $isLast = $ParentLastFlags[-1]
-            $branch = $isLast ? "└── " : "├── "
+            $branch = ($isLast ? "└── " : "├── ")
             Write-Output "$prefix$branch$folderColor$name/$resetColor"
         }
 
@@ -237,9 +239,9 @@ function Show-Tree {
 
             $filePrefix = ""
             for ($j = 0; $j -lt $newFlags.Count - 1; $j++) {
-                $filePrefix += $newFlags[$j] ? "    " : "│   "
+                $filePrefix += ($newFlags[$j] ? "    " : "│   ")
             }
-            $fileBranch = $newFlags[-1] ? "└── " : "├── "
+            $fileBranch = ($newFlags[-1] ? "└── " : "├── ")
 
             if ($child.PSIsContainer) {
                 Show-TreeInternal -Path $child.FullName -ParentLastFlags $newFlags -Depth ($Depth + 1) -MaxDepth $MaxDepth
@@ -259,6 +261,7 @@ function Show-Tree {
     $cwd = Get-Location
     Show-TreeInternal -Path $cwd.Path -ParentLastFlags @() -Depth 0 -MaxDepth $d
 }
+Set-Alias -Name tr -Value Show-Tree
 Export-ModuleMember -Function Show-Tree -Alias tr
 
 #####################################################################
@@ -286,6 +289,9 @@ function Copy-EnvironmentVariablesToClipboard {
         Write-Log -Message "Environment variable '$Name' does not exist." -LogLevel WRN
     }
 }
+Set-Alias -Name copyenv -Value Copy-EnvironmentVariablesToClipboard
+Set-Alias -Name cenv -Value Copy-EnvironmentVariablesToClipboard
+Set-Alias -Name copenv -Value Copy-EnvironmentVariablesToClipboard
 Export-ModuleMember -Function Copy-EnvironmentVariablesToClipboard -Alias copyenv, cenv, copenv
 
 #####################################################################
@@ -325,6 +331,7 @@ function Stop-RunningWSL {
         Write-Log -Message "Aborted." -LogLevel WRN
     }
 }
+Set-Alias -Name exvirt -Value Stop-RunningWSL
 Export-ModuleMember -Function Stop-RunningWSL -Alias exvirt
 
 #####################################################################
@@ -344,6 +351,9 @@ function Start-ElevatedTerminal {
     }
     Start-Process wt.exe -Verb RunAs -ArgumentList "-p `"PowerShell`""
 }
+Set-Alias -Name elevate -Value Start-ElevatedTerminal
+Set-Alias -Name asadmin -Value Start-ElevatedTerminal
+Set-Alias -Name asad -Value Start-ElevatedTerminal
 Export-ModuleMember -Function Start-ElevatedTerminal -Alias elevate, asadmin, asad
 
 #####################################################################
@@ -363,6 +373,8 @@ function OpenPsHistory {
     }
     code (Get-PSReadlineOption).HistorySavePath
 }
+Set-Alias -Name history -Value OpenPsHistory
+Set-Alias -Name hist -Value OpenPsHistory
 Export-ModuleMember -Function OpenPsHistory -Alias history, hist
 
 #####################################################################
@@ -379,6 +391,7 @@ function OpenFileExplorer {
     $currentPath = Get-Location; Start-Process explorer.exe $currentPath
     # or """explorer .""" / $currentPath = pwd; Start-Process explorer.exe $currentPath
 }
+Set-Alias -Name fe -Value OpenFileExplorer
 Export-ModuleMember -Function OpenFileExplorer -Alias fe
 
 #####################################################################
@@ -407,6 +420,7 @@ function GoUpNDirectories {
     $path = (1..$Levels | ForEach-Object { ".." }) -join [IO.Path]::DirectorySeparatorChar
     Set-Location $path
 }
+Set-Alias -Name up -Value GoUpNDirectories
 Export-ModuleMember -Function GoUpNDirectories -Alias up
 
 #####################################################################
@@ -452,6 +466,9 @@ function SlideToShutDown {
     Start-Process "C:\Windows\System32\SlideToShutDown.exe"
     exit
 }
+Set-Alias -Name conexit -Value SlideToShutDown
+Set-Alias -Name cexit -Value SlideToShutDown
+Set-Alias -Name cex -Value SlideToShutDown
 Export-ModuleMember -Function SlideToShutDown -Alias conexit, cexit, cex
 
 #####################################################################
@@ -471,6 +488,7 @@ function DockerContainerPrune {
     }
     docker container prune
 }
+Set-Alias -Name dcp -Value DockerContainerPrune
 Export-ModuleMember -Function DockerContainerPrune -Alias dcp
 
 #####################################################################
@@ -490,6 +508,7 @@ function DockerImagePrune {
     }
     docker image prune
 }
+Set-Alias -Name dip -Value DockerImagePrune
 Export-ModuleMember -Function DockerImagePrune -Alias dip
 
 #####################################################################
@@ -509,6 +528,7 @@ function DockerComposeDown {
     }
     docker compose down
 }
+Set-Alias -Name dcd -Value DockerComposeDown
 Export-ModuleMember -Function DockerComposeDown -Alias dcd
 
 #####################################################################
@@ -528,6 +548,7 @@ function DockerComposeUp {
     }
     docker compose up
 }
+Set-Alias -Name dcu -Value DockerComposeUp
 Export-ModuleMember -Function DockerComposeUp -Alias dcu
 
 #####################################################################
@@ -541,12 +562,13 @@ DockerDesktopStart
 dockerstart
 #>
 function DockerDesktopStart {
-    if (-not (Get-Command docker desktop -ErrorAction SilentlyContinue)) {
+    if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
         Write-Log -Message "Docker Desktop is not installed. Install Docker Desktop before running this command" -LogLevel ERR
         exit 1
     }
     docker desktop start
 }
+Set-Alias -Name dockerstart -Value DockerDesktopStart
 Export-ModuleMember -Function DockerDesktopStart -Alias dockerstart
 
 #####################################################################
@@ -560,12 +582,13 @@ DockerDesktopStop
 dockerstop
 #>
 function DockerDesktopStop {
-    if (-not (Get-Command docker desktop -ErrorAction SilentlyContinue)) {
+    if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
         Write-Log -Message "Docker Desktop is not installed. Install Docker Desktop before running this command" -LogLevel ERR
         exit 1
     }
     docker desktop stop
 }
+Set-Alias -Name dockerstop -Value DockerDesktopStop
 Export-ModuleMember -Function DockerDesktopStop -Alias dockerstop
 
 #####################################################################
@@ -591,6 +614,8 @@ function GoToVisualStudioRepos {
         Write-Log -Message "VisualStudio repositories @ $path not found!" -LogLevel WRN
     }
 }
+Set-Alias -Name repos -Value GoToVisualStudioRepos
+Set-Alias -Name vsrepos -Value GoToVisualStudioRepos
 Export-ModuleMember -Function GoToVisualStudioRepos -Alias repos, vsrepos
 
 #####################################################################
@@ -618,12 +643,39 @@ function GoToProjectsHome {
     
     if (Test-Path $path) {
         Set-Location $path
-        Write-Log -Message "Opening VisualStudio repositories @ $path" -LogLevel INF
+        Write-Log -Message "Opening Projects Home @ $path" -LogLevel INF
     }
     else {
-        Write-Log -Message "VisualStudio repositories @ $path not found!" -LogLevel WRN
+        Write-Log -Message "Projects Home @ $path not found!" -LogLevel WRN
     }
 }
-Export-ModuleMember -Function GoToVisualStudioRepos -Alias repos, vsrepos
+Export-ModuleMember -Function GoToProjectsHome
+
+#####################################################################
+
+Set-Alias -Name rdp -Value mstsc.exe
+Export-ModuleMember -Alias rdp
+
+#####################################################################
+
+<#
+.SYNOPSIS
+Opens the Azure portal in a Microsoft Edge InPrivate window.
+
+.EXAMPLE
+Open-AzurePortal
+
+.EXAMPLE
+azure
+
+.EXAMPLE
+gta
+#>
+function Open-AzurePortal {
+    Start-Process msedge -ArgumentList '--inprivate https://portal.azure.com'
+}
+Set-Alias -Name azure -Value Open-AzurePortal
+Set-Alias -Name gta -Value Open-AzurePortal
+Export-ModuleMember -Function Open-AzurePortal -Alias azure, gta
 
 #####################################################################

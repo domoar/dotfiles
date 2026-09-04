@@ -438,16 +438,21 @@ if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
 
 Install-LatestPowerShellZip -DestinationPath (Join-Path $cfgPath "pwsh/latest")
 
-winget install -e --id OpenJS.NodeJS.LTS
-winget install -e --id Microsoft.WindowsTerminal.Preview
-winget install -e --id Microsoft.PowerToys
-winget install fastfetch
-winget install -e --id Starship.Starship
-winget install -e --id GitHub.cli
-winget install -e --id Git.Git
-winget install -e --id Microsoft.VisualStudioCode
-winget install -e --id Microsoft.AzureCLI
-winget install -e --id Microsoft.Azure.FunctionsCoreTools
+winget install -e --id OpenJS.NodeJS.LTS --source winget
+winget install -e --id Microsoft.WindowsTerminal.Preview --source winget
+winget install -e --id Microsoft.PowerToys --source winget
+winget install -e --id Fastfetch-cli.Fastfetch --source winget
+winget install -e --id Starship.Starship --source winget
+winget install -e --id GitHub.cli --source winget
+winget install -e --id Git.Git --source winget
+winget install -e --id Microsoft.VisualStudioCode --source winget
+winget install -e --id Microsoft.AzureCLI --source winget
+winget install -e --id Microsoft.Azure.FunctionsCoreTools --source winget
+winget install -e --id Derailed.k9s --source winget
+winget install -e --id Docker.DockerDesktop --source winget
+winget install -e --id Hashicorp.Terraform --source winget
+winget install -e --id 
+
 #endregion tools
 
 #####################################################################

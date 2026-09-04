@@ -1,9 +1,20 @@
 using namespace System.Management.Automation
 using namespace System.Management.Automation.Language
 
+# fastfetch
+# Install-Module -Name PSReadLine -AllowClobber -Force
+# Import-Module -Name Terminal-Icons
 # Install-Module -Name Terminal-Icons -Repository PSGallery
 
 Import-Module Terminal-Icons
+$utilsModulePath = @(
+    Join-Path $PSScriptRoot 'modules\utils.psm1'
+    Join-Path $HOME 'dotfiles\os\windows\pwsh\modules\utils.psm1'
+    Join-Path $HOME 'projects\dotfiles\os\windows\pwsh\modules\utils.psm1'
+) | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
+if ($utilsModulePath) {
+    Import-Module $utilsModulePath
+}
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
 Set-PSReadLineOption -PredictionSource History
@@ -19,10 +30,19 @@ Set-PSReadLineOption -AddToHistoryHandler {
     $sensitive = "password|asplaintext|token|key|secret"
     return ($line -notmatch $sensitive)
 }
+Set-PSReadLineOption -AddToHistoryHandler {
+    param ([string]$Line)
+
+    if ($Line -match "^git") {
+        return $false
+    } else {
+        return $true
+    }
+}
 
 
 Set-PSReadLineOption -Colors @{
-    "Command"                = 'White' # cd
+    "Command"                = 'Blue' # cd
     "Parameter"              = 'White' # curl -l -o
     "String"                 = 'White' # curl -v "https://www.google.com"
     "Operator"               = 'White' # (Get-Item .\Untitled-1.json).Count -gt 10 (-gt)
@@ -34,16 +54,11 @@ Set-PSReadLineOption -Colors @{
     "Keyword"                = 'White' # if else
     "Error"                  = 'White' # unclear
     "Emphasis"               = 'White' # Prediction text
-    "InlinePrediction"       = 'Green' # for InlineView
+    "InlinePrediction"       = 'White' # for InlineView
     "ListPrediction"         = 'White' # for ListView
     "ListPredictionSelected" = 'White' # for ListView
     "Default"                = 'White' # 
 }
-
-# This is an example profile for PSReadLine.
-#
-# This is roughly what I use so there is some emphasis on emacs bindings,
-# but most of these bindings make sense in Windows mode as well.
 
 Import-Module PSReadLine
 
@@ -692,8 +707,5 @@ Set-PSReadLineKeyHandler -Chord 'Alt+x' `
     [Microsoft.PowerShell.PSConsoleReadLine]::Insert($unicode)
 }
 
+Invoke-Expression "$(direnv hook pwsh)"
 Invoke-Expression (&starship init powershell)
-# fastfetch
-
-# Install-Module -Name PSReadLine -AllowClobber -Force
-# Import-Module -Name Terminal-Icons

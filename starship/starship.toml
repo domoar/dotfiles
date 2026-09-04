@@ -6,14 +6,43 @@ format = """
 $os\
 $username@\
 $hostname\
+$aws\
+$azure\
+$gcloud\
 $directory\
 $git_branch\
 $git_commit\
 $git_status\
+$c\
+$cpp\
+$java\
+$golang\
+$lua\
+$nodejs\
+$rlang\
+$rust\
 $dotnet\
 $python\
+$buf\
+$bun\
+$cmake\
+$container\
+$direnv\
+$docker_context\
+$gradle\
+$helm\
+$kubernetes\
+$maven\
+$terraform\
 $time\
+$nats\
+$netns\
+$shell\
+$status\
+$sudo\
+$cmd_duration\
 \n$character"""
+
 
 palette = 'custom'
 
@@ -46,7 +75,7 @@ rust_color = "#CE422B"
 terraform_color = "#7B42BC"
 
 [aws]
-symbol = "\uf0e0f"
+symbol = "\uF0E0F"
 format = '\[[$symbol($profile)(\($region\))(\[$duration\])]($style)\]'
 style = 'aws_color'
 [aws.profile_aliases]
@@ -60,19 +89,21 @@ us-west-1 = 'USW-SFO'
 us-west-2 = 'USW-PDX'
 
 [azure]
-symbol = "\uf0805"
+symbol = "\uF0805"
 format = '\[[$symbol ($subscription)]($style)\]'
 style = "azure_color"
 disabled = false
 [azure.subscription_aliases]
-very-long-subscription-name = 'vlsn'
+lz-online-isccb-d = "chatbot-DEV"
+lz-online-isccb-q = "chatbot-QA"
+lz-online-isccb-p = "chatbot-PROD"
 
 [buf]
-symbol = "\uf0fd8"
+symbol = "\uF0FD8"
 format = '\[[$symbol($version)]($style)\]'
 style = 'buf_color'
 detect_extensions = []
-detect_files = []
+detect_files = ["buf.yaml", "buf.gen.yaml", "buf.work.yaml"]
 detect_folders = []
 
 [bun]
@@ -80,47 +111,81 @@ symbol = "\uE76F"
 format = '\[[$symbol($version)]($style)\]'
 style = 'bun_color'
 detect_extensions = []
-detect_files = []
+detect_files = ["bun.lock", "bun.lockb", "bunfig.toml"]
 detect_folders = []
 
 [c]
-symbol = "\uf0671"
+symbol = "\uF0671"
 format = '\[[$symbol($version(-$name))]($style)\]'
 style = 'c_color'
 detect_extensions = []
 detect_files = []
 detect_folders = []
-commands = []
+commands = [["cc", "--version"], ["gcc", "--version"], ["clang", "--version"]]
+
+[character]
+disabled = false
+success_symbol = '[>](bold color_green)'
+error_symbol = '[>](bold color_red)'
+
+[claude_context]
+[claude_model]
+[claude_cost]
 
 [cmake]
-symbol = "\ue794"
+symbol = "\uE794"
 format = '\[[$symbol($version)]($style)\]'
 style = 'cmake_color'
 detect_extensions = []
-detect_files = []
+detect_files = ["CMakeLists.txt", "CMakeCache.txt"]
 detect_folders = []
-
-[cpp]
-symbol = "\uf0672"
-format = '\[[$symbol($version(-$name))]($style)\]'
-style = 'cpp_color'
-detect_extensions = []
-detect_files = []
-detect_folders = []
-commands = []
 
 [cmd_duration]
-format = '\[[took $duration]($style)\]'
+format = '\[ran [$duration](bold)($style)\]'
 style = 'gray'
 show_milliseconds = true
 show_notifications = true
+min_time = 2_000
+disabled = false
 
 [container]
 format = '\[[$symbol \[$name\]]($style)\]'
 style = 'gray'
 
+[cpp]
+symbol = "\uF0672"
+format = '\[[$symbol($version(-$name))]($style)\]'
+style = 'cpp_color'
+detect_extensions = [
+    "cpp",
+    "cc",
+    "cxx",
+    "c++",
+    "hpp",
+    "hh",
+    "hxx",
+    "h++",
+    "tcc",
+]
+detect_files = []
+detect_folders = []
+commands = [
+    [
+        "c++",
+        "--version",
+    ],
+    [
+        "g++",
+        "--version",
+    ],
+    [
+        "clang++",
+        "--version",
+    ],
+]
+
 [directory]
-style = "#769ff0"
+style = "bold white"
 format = '\[[$path]($style)\]'
 truncation_length = 5
 truncation_symbol = '../'
@@ -130,17 +195,27 @@ home_symbol = '~'
 [direnv]
 format = '\[[$symbol$loaded/$allowed]($style)\]'
 style = 'gray'
+detect_extensions = []
+detect_env_vars = ["DIRENV_FILE"]
+detect_files = [".envrc"]
+detect_folders = []
 
 [docker_context]
-symbol = "\uf0868"
+symbol = "\uF0868"
 format = '\[[$symbol$context]($style)\]'
 style = 'docker_color'
 detect_extensions = []
-detect_files = []
+detect_files = [
+    "compose.yml",
+    "compose.yaml",
+    "docker-compose.yml",
+    "docker-compose.yaml",
+    "Dockerfile",
+]
 detect_folders = []
 
 [dotnet]
-symbol = "\uf031b"
+symbol = "\uF031B"
 format = '\[[$symbol ($version)($tfm)]($style)\]'
 style = 'dotnet_color'
 detect_extensions = ['csproj', 'fsproj', 'xproj', 'sln', 'slnx']
@@ -153,6 +228,13 @@ detect_files = [
 ]
 detect_folders = []
 heuristic = true
+
+[env_var.SHELL]
+variable = 'SHELL'
+default = 'unknown shell'
+
+[env_var.USER]
+default = 'unknown user'
 
 [gcloud]
 symbol = "\uE7F1"
@@ -180,111 +262,150 @@ northamerica-northeast2-c = 'NAM-YYZ'
 [git_branch]
 # format = '\[[$symbol on $branch]($style)\]'
 format = '\[[$symbol $branch]($style)'
-style = 'git_color'
-symbol = "\ue702"
+style = 'bold git_color'
+symbol = "\uE702"
 
 [git_commit]
 format = '[\(#$hash$tag\)]($style)\]'
 style = "git_color"
 only_detached = false
 tag_disabled = false
-tag_symbol = "\uf04f9"
+tag_symbol = "\uF04f9"
 disabled = false
 
 [git_status]
 format = '\[([$all_status$ahead_behind]($style))\]'
-style = "git_color"
-modified = 'M'
-untracked = '?'
-staged = '+'
-deleted = 'D'
-renamed = 'R'
-conflicted = '='
+style = "bold git_color"
+modified = "M"
+untracked = "?"
+staged = "+"
+deleted = "D"
+renamed = "R"
+conflicted = "="
 
 [golang]
-symbol = "\uf07d3"
+symbol = "\uF07D3"
 format = '\[[$symbol($version)]($style)\]'
-style = 'go_color'
+style = "bold go_color"
+detect_extensions = ["go"]
+detect_files = [
+    "go.mod",
+    "go.sum",
+    "go.work",
+    "glide.yaml",
+    "Gopkg.yml",
+    "Gopkg.lock",
+    ".go-version",
+]
+detect_folders = ["Godeps"]
 
 [gradle]
 symbol = "\uE7F2"
 format = '\[[$symbol($version)]($style)\]'
-style = 'gradle_color'
+style = "bold gradle_color"
 
 [helm]
 symbol = "\uE7FB"
 format = '\[[$symbol($version)]($style)\]'
-style = 'helm_color'
+style = "bold helm_color"
+detect_extensions = []
+detect_files = ["helmfile.yaml", "Chart.yaml"]
+detect_folders = []
 
 [hostname]
-format = '[$ssh_symbol($hostname) ]($style)'
+format = '[$ssh_symbol($hostname)]($style)\]'
 ssh_only = false
-style = 'gray'
+trim_at = "."
+detect_env_vars = []
+style = "bold white"
+aliases = { "a" = "b" }
 
 [java]
-symbol = "\uf0b37"
+symbol = "\uF0B37"
 format = '\[[$symbol($version)]($style)\]'
-style = 'java_color'
+style = "bold java_color"
 
 [kubernetes]
-symbol = "\uf10fe"
+symbol = "\uF10FE"
 format = '\[[$symbol$context( \($namespace\))]($style)\]'
-style = 'kubernetes_color'
+style = "bold kubernetes_color"
+context_aliases = {}
+user_aliases = {}
+detect_extensions = []
+detect_files = []
+detect_folders = []
+detect_env_vars = []
+contexts = []
+
+[line_break]
+disabled = false
 
 [localip]
 format = '\[[$localipv4]($style)\]'
 style = "yellow"
+disabled = false
+ssh_only = false
 
 [lua]
-symbol = "\uf08b1"
+symbol = "\uF08B1"
 format = '\[[$symbol($version)]($style)\]'
-style = 'lua_color'
+style = "bold lua_color"
 
 [maven]
 symbol = "\uE82C"
 format = '\[[$symbol($version)]($style)\]'
-style = 'maven_color'
+style = "bold maven_color"
+
+[mise]
 
 [nats]
 format = '\[[$symbol$name]($style)\]'
-style = 'gray'
+style = "bold gray"
 
 [netns]
 format = '\[[$symbol \[$name\]]($style)\]'
-style = 'gray'
+style = "bold gray"
 
 [nodejs]
-symbol = "\uf0399"
+symbol = "\uF0399"
 format = '\[[$symbol($version)]($style)\]'
-style = 'nodejs_color'
-#symbol = "\U000F0626" json
+style = "bold nodejs_color"
+detect_extensions = ["js", "mjs", "cjs", "ts", "mts", "cts"]
+detect_files = [
+    "package.json",
+    ".node-version",
+    ".nvmrc",
+    "!bunfig.toml",
+    "!bun.lock",
+    "!bun.lockb",
+    "!deno.json",
+    "!deno.jsonc",
+    "!deno.lock",
+]
+detect_folders = ["node_modules"]
 
 [os]
-format = '[$symbol ]($style)'
-style = 'gray'
+format = '\[[$symbol ]($style)'
+style = "bold white"
 disabled = false
 
 [os.symbols]
-Windows = "\ue8e5"
-Ubuntu = "\uf0548"
-Raspbian = "\ue722"
-Mint = "\uf08ed"
-Macos = "\uf0035"
-Linux = "\uf033d"
-Alpine = "\ue713"
-Arch = "\uf08c7"
-Debian = "\uf08da"
-Redhat = "\uf111b"
-RedHatEnterprise = "\uf111B"
-
-[package]
-format = '\[[$symbol$version]($style)\]'
-style = "orange"
+Windows = "\uE8E5"
+Ubuntu = "\U000F0548"
+Raspbian = "\uE722"
+Mint = "\U000F08ED"
+Macos = "\U000F0035"
+Linux = "\U000F033D"
+Alpine = "\uE713"
+Arch = "\U000F08C7"
+Debian = "\U000F08DA"
+Redhat = "\U000F111B"
+RedHatEnterprise = "\U000F111B"
 
 [python]
-symbol = "\uf0320"
-format = '\[[${symbol} ${pyenv_prefix}(${version}) \(venv:$virtualenv\)]($style)\]'
-style = 'python_color'
+symbol = "\ue73c"
+format = '\[[${symbol}${pyenv_prefix} (${version}) \(venv:$virtualenv\)]($style)\]'
+style = "bold python_color"
 detect_extensions = ['py', 'ipynb']
 detect_files = [
     'requirements.txt',
@@ -295,75 +416,88 @@ detect_files = [
 ]
 detect_folders = []
 generic_venv_names = ['.venv', 'venv']
-
+python_binary = [
+    [
+        'uv',
+        'run',
+        '--no-python-downloads',
+        'python',
+    ],
+    [
+        '.venv/Scripts/python.exe',
+    ],
+    [
+        'python',
+    ],
+    [
+        'py',
+    ],
+]
 
 [rlang]
 symbol = "\uf07d4"
 format = '\[[$symbol ($version)]($style)\]'
-style = 'rlang_color'
+style = "bold rlang_color"
+detect_extensions = ["R", "Rd", "Rmd", "Rproj", "Rsx"]
+detect_files = ["DESCRIPTION"]
+detect_folders = [".Rproj.user"]
 
 [rust]
-symbol = "\uf1617"
-format = '\[[$symbol($version)]($style)\]'
-style = 'rust_color'
+style = "bold rust_color"
+detect_files = ["Cargo.toml"]
+detect_extensions = ["rs"]
+detect_folders = []
 
 [shell]
 format = '\[[$indicator]($style)\]'
-style = 'shell_color'
+style = "shell_color"
+disabled = false
 
 [status]
 format = '\[[$symbol$status]($style)\]'
 style = "red"
 
 [sudo]
-format = '\[[as $symbol]($style)\]'
+format = '\[[sudo cached]($style)\]'
 style = "blue"
+disabled = false
 
 [terraform]
 symbol = "\U000F1062"
 format = '\[[$symbol$workspace]($style)\]'
-style = 'terraform_color'
+style = "terraform_color"
+detect_extensions = ["tf", "tfplan", "tfstate"]
+detect_files = []
+detect_folders = [".terraform"]
+commands = [["terraform", "version"], ["tofu", "version"]]
 
 [time]
 format = '\[[$time]($style)\]'
 disabled = false
 time_format = "%H:%M:%S UTC%:::z"
-style = "gray"
+style = "bold gray"
 utc_time_offset = 'local'
 
 [username]
 format = '[$user]($style)'
 show_always = true
-style_user = 'white'
-style_root = 'red'
-aliases = { "MCDDESKTOP" = "MCDDESKTOP", "MCDLAPTOP" = "MCDLAPTOP" }
-
-[line_break]
-disabled = false
-
-[character]
-disabled = false
-success_symbol = '[>](bold fg:color_green)'
-error_symbol = '[>](bold fg:color_red)'
-
-[env_var.SHELL]
-variable = 'SHELL'
-default = 'unknown shell'
-
-[env_var.USER]
-default = 'unknown user'
+style_user = 'bold blue'
+style_root = 'bold red'
+aliases = { "Administrator" = "Admin" }
 
 [custom.dotnet-workspace]
 command = "dotnet --version"
 when = '[[ "$PWD" == *"/source/repos/"* ]]'
 symbol = "\uE77F"
 format = '\[[$symbol ($version)($tfm)]($style)\]'
-style = 'dotnet_color'
+style = "bold dotnet_color"
 
 # [custom.foo]
 # command = 'echo foo'                     # shows output of command
 # detect_files = ['foo']                     # can specify filters but wildcards are not supported
 # when = ''' test "$HOME" = "$PWD" '''
+# symbol = "\uf1617"
+# format = '\[[$symbol($version)]($style)\]'
 # format = ' transcending [$output]($style)'
 
 # [custom.time]
