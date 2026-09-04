@@ -1,6 +1,8 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
 add_newline = true
+scan_timeout = 1000
+command_timeout = 2000
 
 format = """
 $os\
@@ -105,6 +107,7 @@ style = 'buf_color'
 detect_extensions = []
 detect_files = ["buf.yaml", "buf.gen.yaml", "buf.work.yaml"]
 detect_folders = []
+disabled = true
 
 [bun]
 symbol = "\uE76F"
@@ -128,9 +131,9 @@ disabled = false
 success_symbol = '[>](bold color_green)'
 error_symbol = '[>](bold color_red)'
 
-[claude_context]
-[claude_model]
-[claude_cost]
+# [claude_context]
+# [claude_model]
+# [claude_cost]
 
 [cmake]
 symbol = "\uE794"
@@ -185,20 +188,13 @@ commands = [
 ]
 
 [directory]
-style = "bold white"
+style = "bold cyan"
 format = '\[[$path]($style)\]'
-truncation_length = 5
+truncation_length = 3
 truncation_symbol = '../'
 use_os_path_sep = true
 home_symbol = '~'
-
-[direnv]
-format = '\[[$symbol$loaded/$allowed]($style)\]'
-style = 'gray'
-detect_extensions = []
-detect_env_vars = ["DIRENV_FILE"]
-detect_files = [".envrc"]
-detect_folders = []
+truncate_to_repo = false
 
 [docker_context]
 symbol = "\uF0868"
@@ -282,6 +278,9 @@ staged = "+"
 deleted = "D"
 renamed = "R"
 conflicted = "="
+use_git_executable = false
+disabled = false
+ignore_submodules = true
 
 [golang]
 symbol = "\uF07D3"
@@ -343,7 +342,7 @@ disabled = false
 [localip]
 format = '\[[$localipv4]($style)\]'
 style = "yellow"
-disabled = false
+disabled = true
 ssh_only = false
 
 [lua]
@@ -450,7 +449,7 @@ detect_folders = []
 
 [shell]
 format = '\[[$indicator]($style)\]'
-style = "shell_color"
+style = "dimmed white"
 disabled = false
 
 [status]
@@ -475,22 +474,22 @@ commands = [["terraform", "version"], ["tofu", "version"]]
 format = '\[[$time]($style)\]'
 disabled = false
 time_format = "%H:%M:%S UTC%:::z"
-style = "bold gray"
+style = "dimmed white"
 utc_time_offset = 'local'
 
 [username]
 format = '[$user]($style)'
 show_always = true
-style_user = 'bold blue'
+style_user = 'bold white'
 style_root = 'bold red'
 aliases = { "Administrator" = "Admin" }
 
-[custom.dotnet-workspace]
-command = "dotnet --version"
-when = '[[ "$PWD" == *"/source/repos/"* ]]'
-symbol = "\uE77F"
-format = '\[[$symbol ($version)($tfm)]($style)\]'
-style = "bold dotnet_color"
+# [custom.dotnet-workspace]
+# command = "dotnet --version"
+# when = '[[ "$PWD" == *"/source/repos/"* ]]'
+# symbol = "\uE77F"
+# format = '\[[$symbol ($version)($tfm)]($style)\]'
+# style = "bold dotnet_color"
 
 # [custom.foo]
 # command = 'echo foo'                     # shows output of command

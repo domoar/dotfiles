@@ -35,7 +35,8 @@ Set-PSReadLineOption -AddToHistoryHandler {
 
     if ($Line -match "^git") {
         return $false
-    } else {
+    }
+    else {
         return $true
     }
 }
@@ -707,5 +708,5 @@ Set-PSReadLineKeyHandler -Chord 'Alt+x' `
     [Microsoft.PowerShell.PSConsoleReadLine]::Insert($unicode)
 }
 
-Invoke-Expression "$(direnv hook pwsh)"
+# Invoke-Expression "$(direnv hook pwsh)"
 Invoke-Expression (&starship init powershell)
